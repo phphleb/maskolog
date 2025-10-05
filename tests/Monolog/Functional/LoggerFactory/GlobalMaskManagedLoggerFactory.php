@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MaskologLoggerTests\Monolog\Functional\LoggerFactory;
+
+use Maskolog\AbstractManagedLoggerFactory;
+use Maskolog\Processors\Masking\Context\PasswordMaskingProcessor;
+use Monolog\Logger;
+use Monolog\Processor\PsrLogMessageProcessor;
+use Psr\Log\LogLevel;
+
+class GlobalMaskManagedLoggerFactory extends AbstractManagedLoggerFactory
+{
+    protected const MAX_LEVEL = LogLevel::DEBUG;
+
+    public const CHANNEL_NAME = 'test.channel';
+
+    public function __construct(
+        protected string $maxLevel = self::MAX_LEVEL,
+        protected bool   $maskingEnabled = true,
+    )
+    {
+        parent::__construct($maxLevel, $maskingEnabled);
+    }
+
+    protected function createMonologLogger(): Logger
+    {
+        $logger = (new Logger(self::CHANNEL_NAME))
+            ->useMicrosecondTimestamps(true)
+            ->pushProcessor(new PsrLogMessageProcessor(removeUsedContextFields: false));
+
+          if ($this->maskingEnabled) {
+              $this->pushMaskingProcessor( new PasswordMaskingProcessor(['password', 'pass']));
+          }
+
+        return $logger;
+    }
+}

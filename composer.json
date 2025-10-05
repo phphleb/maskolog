@@ -1,0 +1,39 @@
+{
+  "name": "phphleb/maskolog",
+  "description": "Universal PSR-3 logger based on Monolog with masking",
+  "type": "library",
+  "keywords": [
+    "logger",
+    "Monolog",
+    "masking",
+    "php"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Foma Tuturov",
+      "email": "fomiash@yandex.ru"
+    }
+  ],
+  "require": {
+    "php": ">=8.1",
+    "monolog/monolog": "^3.0",
+    "ext-mbstring": "*",
+    "psr/http-message": "^2.0"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-latest",
+    "phpunit/phpunit": "^9.5",
+    "phpstan/phpstan": "^2.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Maskolog\\" : "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "MaskologLoggerTests\\": "tests"
+    }
+  }
+}
