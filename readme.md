@@ -5,9 +5,10 @@
 
 ![maskolog](https://github.com/phphleb/maskolog/blob/8a33a8e619574ce0b49383a691fb234fbdd5ed80/example.png)
 
-Supports PHP versions v7.1 - 8.0 and [v8.1+](https://github.com/phphleb/maskolog/tree/main)
+Supports PHP versions v7.4 - 8.0 and [v8.1+](https://github.com/phphleb/maskolog/tree/main)
 
-From the author:
+_From the author:_
+
 When I joined a second relatively large company and faced the same requirement to mask logs on production servers, it became clear that this application security issue was broader and warranted a public library. This repository implements the concrete rules we needed to roll out across projects.
 
 + **Masking sensitive data in logs**. Masking is flexible and can be applied globally or selectively. You can also designate specific Monolog handlers on the same logger to bypass masking.
