@@ -1,6 +1,10 @@
 # Maskolog
 
-PSR-3 decorator for the Monolog logger with log-masking capabilities.
+[![version](https://poser.pugx.org/phphleb/maskolog/v)](https://packagist.org/packages/phphleb/maskolog)
+[![License: MIT](https://img.shields.io/badge/License-MIT%20(Free)-31C754.svg)](https://github.com/phphleb/maskolog/blob/master/LICENSE)
+[![tests](https://github.com/phphleb/maskolog/actions/workflows/tests.yml/badge.svg?event=push)](https://github.com/phphleb/maskolog/actions/workflows/tests.yml)
+
+**PSR-3 decorator for the Monolog logger with log-masking capabilities.**
 
 ![maskolog](https://github.com/phphleb/maskolog/blob/7d5c2c45556013d53b7a4cdd28213dbfcd8267ab/example.png)
 
