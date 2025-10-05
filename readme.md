@@ -50,7 +50,7 @@ Masking logger methods return a new instance of the logger with the added proper
 $logger = $logger->withMaskingProcessors([PasswordMaskingProcessor::class => 'password'])
     ->info('Text using password: {password}', ['password' => 'secret_password']);
     
-// 'Text using password: *****' if masking is enabled, otherwise 'Text using password: secret_password'.
+// 'Text using password: *REDACTED.PASSWORD*' if masking is enabled, otherwise 'Text using password: secret_password'.
 
 $logger->withMaskingProcessors([
            StringMaskingProcessor::class => 'token',
@@ -58,7 +58,7 @@ $logger->withMaskingProcessors([
      ])
     ->info('Text using sensitive data: {token}, {password}, {url}', ['password' => 'secret_password', 'token' => 'secret_token', 'url' => 'domain.ru?hash=secret_hash']);
 
-// 'Text using sensitive data: sec*******en, *****, domain.ru?hash=...' if masking is enabled.
+// 'Text using sensitive data: sec*REDACTED*en, *REDACTED.PASSWORD*, domain.ru?hash=REDACTED' if masking is enabled.
 
 ```
 You can find examples of these processors in the _/src/Processors/Masking/_ folder, and also create your own.
