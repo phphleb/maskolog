@@ -2,9 +2,12 @@
 
 PSR-3 decorator for the Monolog logger with log-masking capabilities.
 
-Supports PHP versions v7.1 - 8.0 and v8.1+
+![maskolog](https://github.com/phphleb/maskolog/blob/7d5c2c45556013d53b7a4cdd28213dbfcd8267ab/example.png)
 
-From the author:
+Supports PHP versions [v7.1 - 8.0](https://github.com/phphleb/maskolog/tree/1.x) and **v8.1+**
+
+_From the author:_
+
 When I joined a second relatively large company and faced the same requirement to mask logs on production servers, it became clear that this application security issue was broader and warranted a public library. This repository implements the concrete rules we needed to roll out across projects.
 
 + **Masking sensitive data in logs**. Masking is flexible and can be applied globally or selectively. You can also designate specific Monolog handlers on the same logger to bypass masking.
