@@ -20,12 +20,6 @@ abstract class AbstractMessageMaskingProcessor implements MaskingProcessorInterf
      */
     final public function __invoke(#[\SensitiveParameter] LogRecord $record): LogRecord
     {
-//        if (is_array($record)) {
-//            /** @var array{message: string, context: array<int|string, mixed>} $record */
-//            $record['message'] = $this->updateMessage($record['message'], $record['context']);
-//
-//            return $record;
-//        }
         return $record->with(message: $this->updateMessage($record->message, $record->context));
     }
 

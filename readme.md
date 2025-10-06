@@ -27,7 +27,7 @@ Installation is performed using Composer:
 composer require phphleb/maskolog --no-dev
 ```
 
-## Logger assembly
+## Logger Assembly
 The logger is built from two parts — a factory that creates Monolog instances and an initializer that uses that factory to construct the masking logger itself.
 
 ```php
@@ -40,7 +40,7 @@ $logger = new \Maskolog\Logger($factory);
 Since this library only provides the abstract AbstractManagedLoggerFactory for creating and configuring a factory, the repository includes an ExampleManagedLoggerFactory demonstrating its use.
 The repository also includes an ExampleLogger showing how to extend the logger with additional masking capabilities.
 
-### Log masking methods
+### Log Masking Methods
 
 Whether an added item participates in the masking strategy depends on which logger method is used
 
@@ -84,7 +84,7 @@ $logger->withPasswordMasking()
 ```
 This example is in the ExampleLogger class.
 
-### Methods for masking errors
+### Methods for Masking Errors
 
 The MaskingExceptionTrait trait added to the exception class allows errors to be used in this form:
 
@@ -106,9 +106,8 @@ $logger->withMaskingProcessors([StringMaskingProcessor::class => 'token'])
        ->throwMaskedException($exception);
 ```
 
+### Masking Data According to the Project Configuration
 
-
-### Masking data according to the project configuration
 For masking according to the values from the transferred list, a separate masking processor has been created, which is best assigned globally in the factory:
 
 ```php
@@ -122,7 +121,8 @@ This processor is intended to prevent raw configuration data from appearing in e
 
 The project is expected to catch exceptions and log them via the masking logger.
 
-### Specifying exact fields to mask
+### Specifying Exact Fields to Mask
+
 In the examples above, masking processors were configured with field names that were searched throughout the entire context, regardless of nesting.
 But what if the log context contains a nested array (for example, an API response) and you need to mask a specific field while leaving another field with the same name unmasked?
 This is a rare case, but you can specify a field for masking more precisely:
@@ -139,7 +139,8 @@ If you need to target a field at the top level, wrap it in array brackets — `[
 To mask all nested values under a given key, provide an empty array for that key — `['list' => []]`.
 You can also use numeric target keys (for example, `['list' => [0]]`), although this is not recommended.
 
-### Masking for objects in the context
+### Masking for Objects in the Context
+
 By default, the logger converts objects to arrays, so an object will be masked like a regular associative array of data.
 However, this conversion changes the nesting structure, and you must take that into account when specifying masks directly for fields.
 Global replacements at the logger level work the same as before (the field name becomes a key in the resulting array).
@@ -166,7 +167,7 @@ Direct indication of the target:
 If automatic conversion is disabled, target objects will be passed to masking processors in their original form, so you will need to provide individual masks for each object.
 As an example for repository usage, there are examples for converting a specific object type to the required array format - these are the `Psr7RequestProcessor` and `Psr7ResponseProcessor` classes.
 
-### Masking object fields according to attributes
+### Masking Object Fields According to Attributes
 
 To automatically mask an object's fields in log context, add the special `Mask` attribute.
 
@@ -187,7 +188,8 @@ class ExampleDto {
 
 If a specific masking processor is not specified in the attribute, the default one will be used.
 
-### Initializing the standard Monolog logger
+### Initializing the Standard Monolog Logger
+
 From this wrapper logger you can retrieve the currently initialized Monolog instance at any time, including all associated processors and handlers.
 + The `getMaskingLogger` method returns the logger with all resources, including masking processors, but excluding handlers that are not involved in masking.
 + The `getUnmaskingLogger` method returns the logger without masking processors, and includes only those handlers that are not involved in masking, if such handlers were assigned.
