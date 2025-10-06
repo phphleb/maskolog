@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Maskolog\Exceptions;
 
+use Maskolog\Logger;
 use Maskolog\Processors\MaskingProcessorInterface;
 
 /**
@@ -60,4 +61,28 @@ interface MaskingExceptionInterface extends \Throwable
      *  ```
      */
     public function finalize(bool $isEnableMasking = true): MaskingExceptionInterface;
+
+    /**
+     * Returns the exception status, whether it has been finalized.
+     */
+    public function isFinalized(): bool;
+
+    /**
+     * Sends exception data to the log using the passed logger.
+     *
+     * It is assumed that if errors are caught in the application
+     * and sent to the log, then this method with the error level
+     * will be used for the current type.
+     *
+     * ```php
+     * if ($e instanceof MaskingExceptionInterface) {
+     *     $e->sendToLog($maskingLogger, LogLevel::ERROR);
+     * } else {
+     *     $maskingLogger->error($e);
+     * }
+     * throw $e;
+     *
+     * ```
+     */
+    public function sendToLog(Logger $logger, string $level): void;
 }

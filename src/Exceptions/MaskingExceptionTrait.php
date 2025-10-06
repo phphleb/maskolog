@@ -9,7 +9,8 @@ namespace Maskolog\Exceptions;
 
 use Maskolog\Internal\Exceptions\LogicException;
 use Maskolog\Processors\MaskingProcessorInterface;
-use Monolog\Logger;
+use Maskolog\Logger;
+use Psr\Log\LogLevel;
 
 /**
  * Implements the methods specified in the MaskingExceptionInterface interface
@@ -31,7 +32,9 @@ trait MaskingExceptionTrait
      */
     protected array $processors = [];
 
-    private bool $finalized = false;
+    protected bool $finalized = false;
+
+    protected ?string $rawMessage = null;
 
     /**
      * @inheritDoc
@@ -42,6 +45,8 @@ trait MaskingExceptionTrait
         if ($this->finalized) throw new LogicException('Unable to add context after finalization');
 
         $this->context = $context;
+
+        $this->rawMessage = $this->rawMessage ?? $this->message;
 
         return $this;
     }
@@ -56,7 +61,27 @@ trait MaskingExceptionTrait
 
         array_unshift($this->processors, $processor);
 
+        $this->rawMessage = $this->rawMessage ?? $this->message;
+
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    final public function isFinalized(): bool
+    {
+        return $this->finalized;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    final public function sendToLog(Logger $logger, string $level = LogLevel::ERROR): void
+    {
+        $this->processors and $logger = $logger->withMaskingProcessors($this->processors);
+
+        $logger->log($level, $this->rawMessage ?? $this->message, $this->context);
     }
 
     /**
@@ -109,7 +134,7 @@ trait MaskingExceptionTrait
         return [
             'message' => $this->message,
             'context' => $this->context,
-            'level' => Logger::ERROR,
+            'level' => \Monolog\Logger::ERROR,
             'level_name' => 'ERROR',
             'channel' => 'exception',
             'datetime' => new \DateTimeImmutable(),
