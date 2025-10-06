@@ -95,6 +95,8 @@ throw (new MaskedException('Token output: {token}'))
        ->finalize($isEnableMasking);
 ```
 
+_If you catch all errors in your application at the end of the process to log them, then use the `sendToLog` method of that exception to have the log generated and sent._
+
 And with the addition of the MaskingExceptionInterface interface (in the example for MaskedException), you can get all the necessary data from the logger:
 
 ```php
@@ -103,6 +105,8 @@ $exception = (new MaskedException('Token output: {token}'))->setContext(['token'
 $logger->withMaskingProcessors([StringMaskingProcessor::class => 'token'])
        ->throwMaskedException($exception);
 ```
+
+
 
 ### Masking data according to the project configuration
 For masking according to the values from the transferred list, a separate masking processor has been created, which is best assigned globally in the factory:

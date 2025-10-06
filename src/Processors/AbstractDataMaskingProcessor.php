@@ -18,19 +18,9 @@ abstract class AbstractDataMaskingProcessor implements MaskingProcessorInterface
      * @param LogRecord $record
      * @return LogRecord
      */
+    #[\Override]
     final public function __invoke(#[\SensitiveParameter] LogRecord $record): LogRecord
     {
-//        if (is_array($record)) {
-//            /** @var array{level: int, message: string, context: array<int|string, mixed>} $record */
-//            $this->updateData(
-//                MonologToPsrLevel::toPsr3($record['level'])->value,
-//                $record['message'],
-//                $record['context'],
-//            );
-//
-//            return $record;
-//        }
-
         $message = $record->message;
         $context = $record->context;
         $this->updateData($record->level->toPsrLogLevel(), $message, $context);

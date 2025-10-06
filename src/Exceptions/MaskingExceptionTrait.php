@@ -8,9 +8,11 @@ declare(strict_types=1);
 namespace Maskolog\Exceptions;
 
 use Maskolog\Internal\Exceptions\LogicException;
+use Maskolog\Logger;
 use Maskolog\Processors\MaskingProcessorInterface;
 use Monolog\Level;
 use Monolog\LogRecord;
+use Psr\Log\LogLevel;
 
 /**
  * Implements the methods specified in the MaskingExceptionInterface interface
@@ -32,17 +34,22 @@ trait MaskingExceptionTrait
      */
     protected array $processors = [];
 
-    private bool $finalized = false;
+    protected bool $finalized = false;
+
+    protected ?string $rawMessage = null;
 
     /**
      * @inheritDoc
      * @param array<string, int|string> $context
      */
+    #[\Override]
     final public function setContext(#[\SensitiveParameter] array $context): static
     {
         $this->finalized and throw new LogicException('Unable to add context after finalization');
 
         $this->context = $context;
+
+        $this->rawMessage = $this->rawMessage ?? $this->message;
 
         return $this;
     }
@@ -51,11 +58,14 @@ trait MaskingExceptionTrait
      * @inheritDoc
      * @param callable|MaskingProcessorInterface $processor
      */
+    #[\Override]
     final public function pushMaskingProcessor(callable|MaskingProcessorInterface $processor): static
     {
         $this->finalized and throw new LogicException('Unable to add processors after finalization');
 
         array_unshift($this->processors, $processor);
+
+        $this->rawMessage = $this->rawMessage ?? $this->message;
 
         return $this;
     }
@@ -63,6 +73,27 @@ trait MaskingExceptionTrait
     /**
      * @inheritDoc
      */
+    #[\Override]
+    final public function isFinalized(): bool
+    {
+        return $this->finalized;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    #[\Override]
+    final public function sendToLog(Logger $logger, string $level = LogLevel::ERROR): void
+    {
+        $this->processors and $logger = $logger->withMaskingProcessors($this->processors);
+
+        $logger->log($level, $this->rawMessage ?? $this->message, $this->context);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    #[\Override]
     final public function finalize(bool $isEnableMasking = true): static
     {
         // This is an idempotent method.
