@@ -98,13 +98,6 @@ abstract class AbstractManagedLoggerFactory
      */
     final public function getLogger(): MonologLogger
     {
-        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4) as $i => $t) {
-            if ($i === 0) continue;
-            if (!empty($t['class']) && is_subclass_of($t['class'], self::class)) {
-                throw new LogicException('Call of ' . __METHOD__ . ' from inherited class is prohibited');
-            }
-        }
-
         return $this->logger ?? $this->logger = $this->createMonologLogger();
     }
 
