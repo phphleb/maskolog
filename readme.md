@@ -6,7 +6,9 @@
 
 **PSR-3 decorator for the Monolog logger with log-masking capabilities.**
 
-![maskolog](https://github.com/phphleb/maskolog/blob/7d5c2c45556013d53b7a4cdd28213dbfcd8267ab/example.png)
+<p align="left">
+  <img src="https://github.com/phphleb/maskolog/blob/7d5c2c45556013d53b7a4cdd28213dbfcd8267ab/example.png" style="width: 600px" alt="maskolog" />
+</p>
 
 Supports PHP versions [v7.1 - 8.0](https://github.com/phphleb/maskolog/tree/1.x) and **v8.1+**
 
