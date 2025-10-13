@@ -6,9 +6,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT%20(Free)-31C754.svg)](https://github.com/phphleb/maskolog/blob/master/LICENSE)
 [![tests](https://github.com/phphleb/maskolog/actions/workflows/tests.yaml/badge.svg?event=push)](https://github.com/phphleb/maskolog/actions/workflows/tests.yaml)
 
-
-
-![maskolog](https://github.com/phphleb/maskolog/blob/8a33a8e619574ce0b49383a691fb234fbdd5ed80/example.png)
+<p align="center">
+  <img src="https://github.com/phphleb/maskolog/blob/8a33a8e619574ce0b49383a691fb234fbdd5ed80/example.png" width="80%" alt="maskolog"/>
+</p>
 
 Supports PHP versions v7.4 - 8.0 and [v8.1+](https://github.com/phphleb/maskolog/tree/main)
 
