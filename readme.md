@@ -7,7 +7,7 @@
 [![tests](https://github.com/phphleb/maskolog/actions/workflows/tests.yaml/badge.svg?event=push)](https://github.com/phphleb/maskolog/actions/workflows/tests.yaml)
 
 <p align="center">
-  <img src="https://github.com/phphleb/maskolog/blob/8a33a8e619574ce0b49383a691fb234fbdd5ed80/example.png" style="width: 400px" alt="maskolog" />
+  <img src="https://github.com/phphleb/maskolog/blob/8a33a8e619574ce0b49383a691fb234fbdd5ed80/example.png" style="width: 540px" alt="maskolog" />
 </p>
 
 Supports PHP versions v7.4 - 8.0 and [v8.1+](https://github.com/phphleb/maskolog/tree/main)
