@@ -21,9 +21,14 @@ class ExampleLogger extends Logger
     public function __construct(
         string $maxLevel = LogLevel::ERROR,
         string $stream = 'php://stdout',
-        bool   $enableMasking = true,
+        bool|string $enableMasking = true,
     )
     {
+        // Passing an environment parameter to Symfony.
+        if (is_string($enableMasking)) {
+            $enableMasking = $enableMasking === 'prod';
+        }
+
         parent::__construct(new ExampleManagedLoggerFactory(
             $maxLevel,
             stream: $stream,

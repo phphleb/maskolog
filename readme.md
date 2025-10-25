@@ -190,6 +190,30 @@ class ExampleDto {
 
 If a specific masking processor is not specified in the attribute, the default one will be used.
 
+### Simplified Example of Integration in Symfony
+
+```yaml
+services:
+   Maskolog\ExampleLogger:
+     arguments:
+       - 'debug' # Maximum logging level
+       - 'php://stdout' # Main log handler
+       - '%kernel.environment%'
+
+   Psr\Log\LoggerInterface:
+     alias: Maskolog\ExampleLogger
+
+```
+```php
+public function index(ExampleLogger $exampleLogger, LoggerInterface $psrLogger): void
+{
+    $psrLogger->info('Global masks applied only');
+
+    $exampleLogger->withPasswordMasking()
+        ->info('Local password masking on top of global masks: {password}', ['password' => 'secret_password']);
+}
+```
+
 ### Initializing the Standard Monolog Logger
 
 From this wrapper logger you can retrieve the currently initialized Monolog instance at any time, including all associated processors and handlers.
