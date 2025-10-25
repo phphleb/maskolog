@@ -579,6 +579,32 @@ class Logger implements LoggerInterface
     }
 
     /**
+     * @internal - For replacement of original Monolog object only.
+     *
+     * @see MonologLogger::pushProcessor()
+     *
+     * @param ProcessorInterface|callable $callback
+     */
+    public function pushProcessor($callback): self
+    {
+        array_unshift($this->processors, $callback);
+
+        return $this;
+    }
+
+    /**
+     * @internal - For replacement of original Monolog object only.
+     *
+     * @see MonologLogger::pushHandler()
+     */
+    public function pushHandler(HandlerInterface $handler): self
+    {
+        array_unshift($this->handlers, $handler);
+
+        return $this;
+    }
+
+    /**
      * Returns a clone of the current logger with a new processor
      * and with tracking to make sure that this processor is unique.
      * All objects of this class previously added will be removed
