@@ -17,7 +17,6 @@ _From the author:_
 When I joined a second relatively large company and faced the same requirement to mask logs on production servers, it became clear that this application security issue was broader and warranted a public library. This repository implements the concrete rules we needed to roll out across projects.
 
 + **Masking sensitive data in logs**. Masking is flexible and can be applied globally or selectively. You can also designate specific Monolog handlers on the same logger to bypass masking.
-+ **Masking data in error messages**. Thrown exceptions can be masked while reusing the logger’s existing configuration.
 + **Masking configuration data in exceptions**. Logged errors may include environment settings, tokens, and other secrets. This logger locates such values in the context and masks them by value.
 
 This library is intended for corporate environments; you should be familiar enough to handle installation and usage details not covered in this brief guide.
@@ -83,27 +82,6 @@ $logger->withPasswordMasking()
 ```
 This example is in the ExampleLogger class.
 
-### Methods for Masking Errors
-
-The MaskingExceptionTrait trait added to the exception class allows errors to be used in this form:
-
-```php
-throw (new MaskedException('Token output: {token}'))
-       ->setContext(['token' => 'secret'])
-       ->pushMaskingProcessor(new StringMaskingProcessor(['token']))
-       ->finalize($isEnableMasking);
-```
-
-_If you catch all errors in your application at the end of the process to log them, then use the `sendToLog` method of that exception to have the log generated and sent._
-
-And with the addition of the MaskingExceptionInterface interface (in the example for MaskedException), you can get all the necessary data from the logger:
-
-```php
-$exception = (new MaskedException('Token output: {token}'))->setContext(['token' => 'secret']);
-           
-$logger->withMaskingProcessors([StringMaskingProcessor::class => 'token'])
-       ->throwMaskedException($exception);
-```
 
 ### Masking Data According to the Project Configuration
 
