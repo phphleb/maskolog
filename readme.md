@@ -146,6 +146,19 @@ Direct indication of the target:
 If automatic conversion is disabled, target objects will be passed to masking processors in their original form, so you will need to provide individual masks for each object.
 As an example for repository usage, there are examples for converting a specific object type to the required array format - these are the `Psr7RequestProcessor` and `Psr7ResponseProcessor` classes.
 
+### Demonstration of Symfony Service Initialization
+
+```yaml
+    services:
+      Maskolog\ExampleLogger:
+         arguments:
+            - 'debug'
+
+      Psr\Log\LoggerInterface:
+          alias: Maskolog\ExampleLogger
+
+```
+
 ### Initializing the Standard Monolog Logger
 
 From this wrapper logger you can retrieve the currently initialized Monolog instance at any time, including all associated processors and handlers.
