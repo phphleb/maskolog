@@ -39,7 +39,6 @@ class ProcessorManager
             }
         }
         /** @var array<int, callable|ProcessorInterface|MaskingProcessorInterface> */
-
         return array_values(array_filter($processors));
     }
 
@@ -93,7 +92,6 @@ class ProcessorManager
             $maskingProcessor = new $maskingKey($processorValue);
         }
         /** @var array<int, callable|MaskingProcessorInterface> */
-
         return array_values($maskingProcessors);
     }
 

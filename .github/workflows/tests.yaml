@@ -44,4 +44,4 @@ jobs:
       - name: Run PHPStan
         run: |
           echo "Running PHPStan analysis..."
-          php vendor/bin/phpstan analyse --configuration=phpstan.neon --verbose --error-format=github --no-progress
+          php vendor/bin/phpstan analyse --configuration=phpstan.neon --verbose
