@@ -66,7 +66,6 @@ class ProcessorManager
         }
     }
 
-
     /**
      * Converts masking processors from the internal standard to an initialized object.
      *
@@ -75,32 +74,28 @@ class ProcessorManager
      */
     public static function convert(array $maskingProcessors): array
     {
-        $result = [];
-
-        foreach($maskingProcessors as $maskingProcessor) {
+        foreach($maskingProcessors as &$maskingProcessor) {
             if (!is_array($maskingProcessor)) {
-                $result[] = $maskingProcessor;
                 continue;
             }
-
             $maskingKey = key($maskingProcessor);
-            if (!is_subclass_of((string)$maskingKey, MaskingProcessorInterface::class)) {
-                $result[] = $maskingProcessor;
+            if (!is_subclass_of((string)$maskingKey,MaskingProcessorInterface::class)) {
                 continue;
             }
-
             $processorValue = $maskingProcessor[$maskingKey];
             if (is_string($processorValue)) {
                 $processorValue = [$processorValue];
             }
-
-            /** @var class-string<MaskingProcessorInterface> $maskingKey */
-            $result[] = new $maskingKey($processorValue);
+            /**
+             * @var callable $processorValue
+             */
+            $maskingProcessor = new $maskingKey($processorValue);
         }
+        /** @var array<int, callable|MaskingProcessorInterface> $maskingProcessors */
+        $maskingProcessors = array_values($maskingProcessors);
 
-        return $result;
+        return $maskingProcessors;
     }
-
 
     /**
      * Returns the modified array of processors if a match is found in it during addition.
