@@ -91,10 +91,10 @@ class ProcessorManager
              */
             $maskingProcessor = new $maskingKey($processorValue);
         }
-        /** @var array<int, callable|MaskingProcessorInterface> $maskingProcessors */
-        $maskingProcessors = array_values($maskingProcessors);
+        /** @var array<int, callable|MaskingProcessorInterface> $result */
+        $result = array_values($maskingProcessors);
 
-        return $maskingProcessors;
+        return $result;
     }
 
     /**
