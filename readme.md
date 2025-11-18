@@ -191,6 +191,19 @@ public function index(ExampleLogger $exampleLogger, LoggerInterface $psrLogger):
 }
 ```
 
+### Demonstration of Symfony Service Initialization
+
+```yaml
+    services:
+      Maskolog\ExampleLogger:
+         arguments:
+            - 'debug'
+
+      Psr\Log\LoggerInterface:
+          alias: Maskolog\ExampleLogger
+
+```
+
 ### Initializing the Standard Monolog Logger
 
 From this wrapper logger you can retrieve the currently initialized Monolog instance at any time, including all associated processors and handlers.
