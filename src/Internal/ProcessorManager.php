@@ -91,9 +91,10 @@ class ProcessorManager
              */
             $maskingProcessor = new $maskingKey($processorValue);
         }
-        /** @var array<int, callable|MaskingProcessorInterface> $result */
+        /** @phpstan-var array<int|string, callable|MaskingProcessorInterface> $maskingProcessors */
         $result = array_values($maskingProcessors);
 
+        /** @var array<int, callable|MaskingProcessorInterface> $result */
         return $result;
     }
 
