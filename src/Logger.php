@@ -217,7 +217,7 @@ class Logger implements LoggerInterface
      * ```
      *
      * @param array<int|string, array<int|string, mixed>|string|MaskingProcessorInterface|callable> $value
-     * @return $this
+     * @return Logger
      */
     final public function withMaskingProcessors(array $value): Logger
     {
