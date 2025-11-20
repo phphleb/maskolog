@@ -52,8 +52,9 @@ Whether an added item participates in the masking strategy depends on which logg
 Masking logger methods return a new instance of the logger with the added properties.
 
 ```php
-$logger = $logger->withMaskingProcessors([PasswordMaskingProcessor::class => 'password'])
-    ->info('Text using password: {password}', ['password' => 'secret_password']);
+$logger = $logger->withMaskingProcessors([PasswordMaskingProcessor::class => 'password']);
+
+$logger->info('Text using password: {password}', ['password' => 'secret_password']);
     
 // 'Text using password: *REDACTED.PASSWORD*' if masking is enabled, otherwise 'Text using password: secret_password'.
 
