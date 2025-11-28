@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Maskolog\Processors\Masking\Context;
 
 use Maskolog\Enums\UrlMaskingStatus;
+use Maskolog\Internal\Exceptions\LogicException;
 use Maskolog\Processors\AbstractContextMaskingProcessor;
 use Stringable;
 
@@ -88,8 +89,12 @@ class UrlMaskingProcessor extends AbstractContextMaskingProcessor
     private function replace(#[\SensitiveParameter] string $queryString): string
     {
         $queryParts = explode('&', $queryString);
+        $currentCell = $this->getCurrentCell();
+        if ($currentCell === null) {
+            throw new LogicException('The value must not be NULL');
+        }
         /** @var array<int|string, mixed> $keys */
-        $keys = $this->maskingRules[$this->getCurrentCell()] ?? [];
+        $keys = $this->maskingRules[$currentCell] ?? [];
         $keyNumber = 0;
         foreach ($queryParts as &$queryPart) {
             $items = explode('=', $queryPart, 2);

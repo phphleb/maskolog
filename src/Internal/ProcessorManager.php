@@ -79,6 +79,9 @@ class ProcessorManager
                 continue;
             }
             $maskingKey = key($maskingProcessor);
+            if ($maskingKey === null) {
+                continue;
+            }
             if (!is_subclass_of((string)$maskingKey,MaskingProcessorInterface::class)) {
                 continue;
             }

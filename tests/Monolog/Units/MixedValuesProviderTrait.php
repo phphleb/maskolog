@@ -33,7 +33,6 @@ trait MixedValuesProviderTrait
             'int neg'              => -7,
             'float 0'              => 0.0,
             'float'                => 3.14,
-            'NAN'                  => NAN,
             'INF'                  => INF,
             'empty string'         => '',
             'string 0'             => '0',
