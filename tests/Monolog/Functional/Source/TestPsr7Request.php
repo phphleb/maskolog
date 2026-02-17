@@ -12,12 +12,35 @@ use InvalidArgumentException;
 
 class TestPsr7Request implements RequestInterface
 {
-    private UriInterface $uri;
-    private string $method;
-    private string $requestTarget;
-    private StreamInterface $body;
-    private array $headers;
-    private string $protocolVersion;
+    /**
+     * @var UriInterface|TestUriFromRequest
+     */
+    private $uri;
+
+    /**
+     * @var string
+     */
+    private $method;
+
+    /**
+     * @var string
+     */
+    private $requestTarget;
+
+    /**
+     * @var StreamInterface|TestStreamPsr
+     */
+    private $body;
+
+    /**
+     * @var array
+     */
+    private $headers;
+
+    /**
+     * @var string
+     */
+    private $protocolVersion;
 
     /**
      * @param string $method

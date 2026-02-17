@@ -23,7 +23,7 @@ class LogWithSingleProcessorTest extends TestCase
        $processors = $logger->getMaskingLogger()->getProcessors();
        $counter = 0;
        foreach($processors as $processor) {
-           if (is_object($processor) && get_class($processor) === ExtraModifierProcessor::class) {
+           if (is_object($processor) && get_class((object)$processor) === ExtraModifierProcessor::class) {
                $counter++;
            }
        }
@@ -34,7 +34,7 @@ class LogWithSingleProcessorTest extends TestCase
        $search = 0;
        $all = 0;
        foreach($processors as $processor) {
-           if (is_object($processor) && get_class($processor) === ExtraModifierProcessor::class) {
+           if (is_object($processor) && get_class((object)$processor) === ExtraModifierProcessor::class) {
                $record = $processor($this->createLogRecord([]));
                if (isset($record['extra']['tag'])) {
                    $search++;

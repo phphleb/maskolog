@@ -33,37 +33,62 @@ class Logger implements LoggerInterface
     /**
      * @var array<int, MaskingProcessorInterface|array<int|string, mixed>|callable>
      */
-    private array $maskingProcessors = [];
+    private $maskingProcessors = [];
 
     /**
      * @var array<int, callable|ProcessorInterface|null>
      */
-    private array $processors = [];
+    private $processors = [];
 
     /**
      * @var HandlerInterface[]
      */
-    private array $unmaskingHandlers = [];
+    private $unmaskingHandlers = [];
 
     /**
      * @var HandlerInterface[]
      */
-    private array $handlers = [];
+    private $handlers = [];
 
-    private ?MonologLogger $maskingLogger = null;
+    /**
+     * @var MonologLogger|null
+     */
+    private $maskingLogger = null;
 
-    private ?MonologLogger $unmaskingLogger = null;
+    /**
+     * @var MonologLogger|null
+     */
+    private $unmaskingLogger = null;
 
-    private string $maxLevel;
+    /**
+     * @var string
+     */
+    private $maxLevel;
 
-    private bool $isEnableMasking;
+    /**
+     * @var bool
+     */
+    private $isEnableMasking;
 
-    private bool $removeDuplicates;
+    /**
+     * @var bool
+     */
+    private $removeDuplicates;
 
-    private string $name = '';
+    /**
+     * @var string
+     */
+    private $name = '';
 
-    private ?LoggerExceptionHandlerInterface $exceptionHandler;
-    private AbstractManagedLoggerFactory $loggerFactory;
+    /**
+     * @var LoggerExceptionHandlerInterface|null
+     */
+    private $exceptionHandler;
+
+    /**
+     * @var AbstractManagedLoggerFactory
+     */
+    private $loggerFactory;
 
     public function __construct(AbstractManagedLoggerFactory $loggerFactory)
     {

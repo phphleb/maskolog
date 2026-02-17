@@ -9,9 +9,20 @@ use RuntimeException;
 
 class TestStreamPsr implements StreamInterface
 {
-    private string $body;
-    private int $position = 0;
-    private bool $closed = false;
+    /**
+     * @var string
+     */
+    private $body;
+
+    /**
+     * @var int
+     */
+    private $position = 0;
+
+    /**
+     * @var bool
+     */
+    private $closed = false;
 
     public function __construct(string $body = '')
     {

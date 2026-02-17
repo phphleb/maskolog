@@ -22,26 +22,48 @@ use Monolog\Logger as MonologLogger;
  */
 abstract class AbstractManagedLoggerFactory
 {
-    protected string $maxLevel;
-    protected bool $maskingEnabled;
-    protected bool $deduplicateMaskingProcessors = true;
-    protected bool $maskObjects = true;
-    private ?MonologLogger $logger = null;
+    /**
+     * @var string
+     */
+    protected $maxLevel;
+
+    /**
+     * @var bool
+     */
+    protected $maskingEnabled;
+
+    /**
+     * @var bool
+     */
+    protected $deduplicateMaskingProcessors = true;
+
+    /**
+     * @var bool
+     */
+    protected $maskObjects = true;
+
+    /**
+     * @var MonologLogger|null
+     */
+    private $logger = null;
 
     /**
      * @var MaskingProcessorInterface[]
      */
-    private array $maskingProcessors = [];
+    private $maskingProcessors = [];
 
     /**
      * @var HandlerInterface[]
      */
-    private array $unmaskingHandlers = [];
+    private $unmaskingHandlers = [];
 
     /** @var AbstractObjectProcessor[] */
-    private array $updateObjectProcessors = [];
+    private $updateObjectProcessors = [];
 
-    private ?LoggerExceptionHandlerInterface $exceptionHandler = null;
+    /**
+     * @var LoggerExceptionHandlerInterface|null
+     */
+    private $exceptionHandler = null;
 
     /**
      * Basic mandatory logger constructor.

@@ -34,7 +34,10 @@ class ObjectToArrayConverterProcessorTest extends TestCase
     {
         $converter = new ObjectToArrayConverterProcessor();
         $object = new class {
-            public string $cell = 'secret_cell';
+            /**
+             * @var string
+             */
+            public $cell = 'secret_cell';
         };
         $context = [$object];
         $converter->update($context);

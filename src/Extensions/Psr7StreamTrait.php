@@ -137,7 +137,11 @@ trait Psr7StreamTrait
                     if ($hasEqualsInItems !== count($items)) {
                         $result[$key] = trim($value);
                     } else {
-                        $items = array_filter($items, fn($v) => $v !== '');
+
+                        $items = array_filter($items, function($v) {
+                            return $v !== '';
+                        });
+
                         $result[$key] = $items;
                     }
                 } else {

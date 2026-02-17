@@ -6,7 +6,6 @@ namespace MaskologLoggerTests\Monolog\Units;
 
 use Monolog\Level;
 use Monolog\Logger;
-use Monolog\LogRecord;
 
 trait CreateLogRecordTrait
 {

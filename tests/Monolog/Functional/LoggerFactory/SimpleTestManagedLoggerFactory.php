@@ -13,9 +13,21 @@ class SimpleTestManagedLoggerFactory extends AbstractManagedLoggerFactory
     protected const MAX_LEVEL = LogLevel::DEBUG;
 
     public const CHANNEL_NAME = 'test.channel';
-    protected string $maxLevel = self::MAX_LEVEL;
-    protected bool $maskingEnabled = true;
-    protected bool $maskObjects = true;
+
+    /**
+     * @var string
+     */
+    protected $maxLevel = self::MAX_LEVEL;
+
+    /**
+     * @var bool
+     */
+    protected $maskingEnabled = true;
+
+    /**
+     * @var bool
+     */
+    protected $maskObjects = true;
 
     public function __construct(
         string $maxLevel = self::MAX_LEVEL,

@@ -48,6 +48,6 @@ class SourceTest extends TestCase
 
    private function delegateLocation(): array
    {
-        return [...SourceLocator::get(1)];
+       return array_values(SourceLocator::get(1));
    }
 }

@@ -20,21 +20,28 @@ use Psr\Log\LogLevel;
  */
 trait MaskingExceptionTrait
 {
-    protected string $pattern = '{%s}';
+    /** @var string  */
+    protected $pattern = '{%s}';
 
     /**
      * @var array<string, int|string> $context
      */
-    protected array $context = [];
+    protected $context = [];
 
     /**
      * @var (callable|MaskingProcessorInterface)[]
      */
-    protected array $processors = [];
+    protected $processors = [];
 
-    protected bool $finalized = false;
+    /**
+     * @var bool
+     */
+    protected $finalized = false;
 
-    protected ?string $rawMessage = null;
+    /**
+     * @var string|null
+     */
+    protected $rawMessage = null;
 
     /**
      * @inheritDoc

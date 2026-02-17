@@ -9,9 +9,15 @@ use Monolog\ResettableInterface;
 
 class ResetCloseSpyHandler extends TestHandler implements ResettableInterface
 {
-    private int $numClosed = 0;
+    /**
+     * @var int
+     */
+    private $numClosed = 0;
 
-    private int $numReset = 0;
+    /**
+     * @var int
+     */
+    private $numReset = 0;
 
     public function close(): void
     {

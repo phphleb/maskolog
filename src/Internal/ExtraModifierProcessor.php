@@ -17,7 +17,7 @@ class ExtraModifierProcessor implements ProcessorInterface
     /**
      * @var array<int|string, mixed>
      */
-    private array $extra;
+    private $extra;
 
     /**
      * @param array<int|string, mixed> $extra

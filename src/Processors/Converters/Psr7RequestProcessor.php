@@ -18,9 +18,15 @@ class Psr7RequestProcessor extends AbstractObjectProcessor
 {
     use Psr7StreamTrait;
 
-    protected int $maxBodySize;
+    /**
+     * @var int
+     */
+    protected $maxBodySize;
 
-    protected int $chunkSize;
+    /**
+     * @var int
+     */
+    protected $chunkSize;
 
     public function __construct(
         int $maxBodySize = 1048576,

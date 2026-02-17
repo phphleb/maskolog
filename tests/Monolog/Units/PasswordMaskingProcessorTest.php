@@ -15,7 +15,10 @@ final class PasswordMaskingProcessorTest extends TestCase
     use CreateLogRecordTrait;
     use MixedValuesProviderTrait;
 
-    private PasswordMaskingProcessor $processor;
+    /**
+     * @var PasswordMaskingProcessor
+     */
+    private $processor;
 
     protected function setUp(): void
     {

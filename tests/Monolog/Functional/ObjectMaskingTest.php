@@ -32,10 +32,10 @@ class ObjectMaskingTest  extends TestCase
             [PasswordMaskingProcessor::class => ['secretCell', 'readonlyCell', 'lowercaseCell']]
         );
         $object = new class {
-            public string $unmaskCell = 'unmask_cell';
-            public string $secretCell = 'secret_cell';
-            public string $lowercasecell = 'secret_cell';
-            public string $readonlyCell = 'secret_cell';
+            public $unmaskCell = 'unmask_cell';
+            public $secretCell = 'secret_cell';
+            public $lowercasecell = 'secret_cell';
+            public $readonlyCell = 'secret_cell';
         };
         $message = 'Test ' . __METHOD__;
         $logger->log(LogLevel::INFO, $message, ['obj' => $object]);
@@ -62,15 +62,22 @@ class ObjectMaskingTest  extends TestCase
             [PasswordMaskingProcessor::class => ['secretCell', 'readonlyCell', 'lowercaseCell']]
         );
         $object = new class {
-            public string $unmaskCell = 'unmask_cell';
-            public string $lowercasecell = 'secret_cell';
-            public string $secretCell = 'secret_cell';
-            public string $readonlyCell = 'secret_cell';
+            public $unmaskCell = 'unmask_cell';
+            public $lowercasecell = 'secret_cell';
+            public $secretCell = 'secret_cell';
+            public $readonlyCell = 'secret_cell';
 
         };
         $parentObject = new class {
-            public ?object $readonlyCell = null;
-            public ?object $testCell = null;
+            /**
+             * @var object|null
+             */
+            public $readonlyCell = null;
+
+            /**
+             * @var object|null
+             */
+            public $testCell = null;
 
             public function __construct(
                 ?object $readonlyCell = null,
@@ -108,14 +115,21 @@ class ObjectMaskingTest  extends TestCase
             [PasswordMaskingProcessor::class => []]
         );
         $object = new class {
-            public string $maskCell = 'mask_cell';
-            public string $secretCell = 'secret_cell';
-            public string $lowercasecell = 'secret_cell';
-            public string $readonlyCell = 'secret_cell';
+            public $maskCell = 'mask_cell';
+            public $secretCell = 'secret_cell';
+            public $lowercasecell = 'secret_cell';
+            public $readonlyCell = 'secret_cell';
         };
         $parentObject = new class {
-            public ?object $readonlyCell = null;
-            public ?object $testCell = null;
+            /**
+             * @var object|null
+             */
+            public $readonlyCell = null;
+
+            /**
+             * @var object|null
+             */
+            public $testCell = null;
 
             public function __construct(
                 ?object $readonlyCell = null,
@@ -165,9 +179,12 @@ class ObjectMaskingTest  extends TestCase
             ]]
         );
         $levelObject = new class {
-            public ?object $level = null;
-            public string $secretCell = 'secret_cell';
-            public string $unmaskCell = 'unmask_cell';
+            /**
+             * @var object|null
+             */
+            public $level = null;
+            public $secretCell = 'secret_cell';
+            public $unmaskCell = 'unmask_cell';
 
             public function __construct(
                 ?object $level = null,
@@ -180,9 +197,12 @@ class ObjectMaskingTest  extends TestCase
             }
         };
         $sublevelObject = new class {
-            public ?object $sublevel = null;
-            public string $secretCell = 'secret_cell';
-            public string $unmaskCell = 'unmask_cell';
+            /**
+             * @var object|null
+             */
+            public $sublevel = null;
+            public $secretCell = 'secret_cell';
+            public $unmaskCell = 'unmask_cell';
 
             public function __construct(
                 ?object $sublevel = null,
@@ -195,9 +215,9 @@ class ObjectMaskingTest  extends TestCase
             }
         };
         $object = new class {
-            public string $innerCell = 'secret_cell';
-            public string $secretCell = 'secret_cell';
-            public string $unmaskCell = 'unmask_cell';
+            public $innerCell = 'secret_cell';
+            public $secretCell = 'secret_cell';
+            public $unmaskCell = 'unmask_cell';
 
             public function __construct(
                 string $innerCell = 'secret_cell',

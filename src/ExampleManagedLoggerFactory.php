@@ -23,13 +23,40 @@ use Psr\Log\LogLevel;
  */
 class ExampleManagedLoggerFactory extends AbstractManagedLoggerFactory
 {
-    protected int $maxFiles = 0;
-    protected int $bufferLimit = 0;
-    protected string $maxLevel = LogLevel::ERROR;
-    protected string $stream = 'php://stdout';
-    protected string $channel = 'app';
-    protected string $filePrefix = 'example';
-    protected bool $maskingEnabled = true;
+    /**
+     * @var int
+     */
+    protected $maxFiles = 0;
+
+    /**
+     * @var int
+     */
+    protected $bufferLimit = 0;
+
+    /**
+     * @var string
+     */
+    protected $maxLevel = LogLevel::ERROR;
+
+    /**
+     * @var string
+     */
+    protected $stream = 'php://stdout';
+
+    /**
+     * @var string
+     */
+    protected $channel = 'app';
+
+    /**
+     * @var string
+     */
+    protected $filePrefix = 'example';
+
+    /**
+     * @var bool
+     */
+    protected $maskingEnabled = true;
 
     /**
      * Example of setting the parameters required to create a logger.

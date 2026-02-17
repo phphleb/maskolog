@@ -7,10 +7,10 @@ namespace MaskologLoggerTests\Monolog\Functional\Source;
 class TestObject
 {
     /** This field is readonly in another version of the logger. */
-    public string $publicReadonlySecretCell = 'public_readonly_secret_data';
-    public string $publicSecretCell = 'public_secret_data';
-    public string $publicCell = 'public_data';
-    protected string $protectedCell = 'protected_data';
+    public $publicReadonlySecretCell = 'public_readonly_secret_data';
+    public $publicSecretCell = 'public_secret_data';
+    public $publicCell = 'public_data';
+    protected $protectedCell = 'protected_data';
 
     public function __construct(
        string $publicReadonlySecretCell = 'public_readonly_secret_data',

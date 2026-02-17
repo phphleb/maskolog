@@ -7,7 +7,6 @@ namespace MaskologLoggerTests\Monolog\Units;
 use ArrayObject;
 use Maskolog\Enums\ClassType;
 use stdClass;
-use WeakReference;
 
 trait MixedValuesProviderTrait
 {
@@ -53,11 +52,6 @@ trait MixedValuesProviderTrait
             'callable string'      => 'strlen',
             'callable array'       => [$ao, 'getArrayCopy'],
         ];
-
-        if (class_exists('WeakReference')) {
-            $o = new stdClass();
-            $values['WeakReference'] = WeakReference::create($o);
-        }
 
         $values['enum'] = ClassType::ANONYMOUS;
 

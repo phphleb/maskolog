@@ -21,7 +21,7 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
     /**
      * @var array<int|string, int|string|array<int|string, mixed>>
      */
-    protected array $cells = [];
+    protected $cells = [];
 
     /** @var int|string|null  */
     private $currentCell = null;

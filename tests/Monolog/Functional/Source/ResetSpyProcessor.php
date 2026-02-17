@@ -9,7 +9,7 @@ use Monolog\ResettableInterface;
 
 class ResetSpyProcessor  implements ProcessorInterface, ResettableInterface
 {
-    private int $numReset = 0;
+    private $numReset = 0;
 
     public function reset(): void
     {

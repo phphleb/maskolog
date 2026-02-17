@@ -9,13 +9,40 @@ use InvalidArgumentException;
 
 class TestUriFromRequest implements UriInterface
 {
-    private string $scheme;
-    private string $userInfo;
-    private string $host;
-    private ?int $port;
-    private string $path;
-    private string $query;
-    private string $fragment;
+    /**
+     * @var string
+     */
+    private $scheme;
+
+    /**
+     * @var string
+     */
+    private $userInfo;
+
+    /**
+     * @var string
+     */
+    private $host;
+
+    /**
+     * @var int|null
+     */
+    private $port;
+
+    /**
+     * @var string
+     */
+    private $path;
+
+    /**
+     * @var string
+     */
+    private $query;
+
+    /**
+     * @var string
+     */
+    private $fragment;
 
     public function __construct(
         string $scheme = 'http',
@@ -243,14 +270,18 @@ class TestUriFromRequest implements UriInterface
         return $port;
     }
 
+
     private function normalizePath(string $path): string
     {
         return (string)preg_replace_callback(
             '/[^a-zA-Z0-9_\-\.~!$&\'()*+,;=:@\/]/',
-            fn($matches) => rawurlencode($matches[0]),
+            function ($matches) {
+                return rawurlencode($matches[0]);
+            },
             $path
         );
     }
+
 
     private function formatUserInfo(string $user, ?string $password = null): string
     {

@@ -11,11 +11,30 @@ use InvalidArgumentException;
 
 class TestPsr7Response implements ResponseInterface
 {
-    private int $statusCode;
-    private string $reasonPhrase;
-    private StreamInterface $body;
-    private array $headers;
-    private string $protocolVersion;
+    /**
+     * @var int
+     */
+    private $statusCode;
+
+    /**
+     * @var string
+     */
+    private $reasonPhrase;
+
+    /**
+     * @var StreamInterface|TestStreamPsr
+     */
+    private $body;
+
+    /**
+     * @var array
+     */
+    private $headers;
+
+    /**
+     * @var string
+     */
+    private $protocolVersion;
 
     /** @var array<int, string> */
     private const REASON_PHRASES = [

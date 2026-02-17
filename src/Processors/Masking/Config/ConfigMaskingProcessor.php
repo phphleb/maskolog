@@ -37,13 +37,17 @@ class ConfigMaskingProcessor extends AbstractDataMaskingProcessor
     /**
      * @var string[]
      */
-    protected array $config;
+    protected $config;
 
     /**
      * @var array<int, string>
      */
-    protected array $maskByLevels;
-    protected AbstractContextMaskingProcessor $maskingProcessor;
+    protected $maskByLevels;
+
+    /**
+     * @var AbstractContextMaskingProcessor|MaskingProcessor
+     */
+    protected $maskingProcessor;
 
     /**
      * Since searching in text is resource-intensive, it is recommended

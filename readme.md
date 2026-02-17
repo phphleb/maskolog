@@ -10,7 +10,7 @@
   <img src="https://github.com/phphleb/maskolog/blob/8a33a8e619574ce0b49383a691fb234fbdd5ed80/example.png" style="width: 600px" alt="maskolog" />
 </p>
 
-Supports PHP versions v7.4 - 8.0 and [v8.1+](https://github.com/phphleb/maskolog/tree/main)
+Supports PHP versions v7.3, [v7.4 - 8.0](https://github.com/phphleb/maskolog/tree/1.x) and [v8.1+](https://github.com/phphleb/maskolog/tree/main)
 
 _From the author:_
 
@@ -172,7 +172,7 @@ From this wrapper logger you can retrieve the currently initialized Monolog inst
 + Examples use the global processor `Monolog\Processor\PsrLogMessageProcessor` with the `removeUsedContextFields` option enabled to substitute context values into the log message.
 
 <div style="border:1px solid #ddd; padding:10px; border-radius:6px;">
-  This Maskolog 1.x release (PHP v7.4–8.0) supports Monolog 2. When migrating to Maskolog 2.x (PHP v8.1+), note that it uses Monolog 3, which changed the LogRecord format (the array was replaced by an object) and introduces other incompatible changes.
+  This Maskolog 0.x release (PHP v7.3) supports Monolog 2. When migrating to Maskolog 2.x (PHP v8.1+), note that it uses Monolog 3, which changed the LogRecord format (the array was replaced by an object) and introduces other incompatible changes.
 </div>
 
 ### Conclusion

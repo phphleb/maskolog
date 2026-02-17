@@ -21,7 +21,7 @@ use Stringable;
 class UrlMaskingProcessor extends AbstractContextMaskingProcessor
 {
     /** @var array<int|string, mixed> */
-    protected array $maskingRules = [];
+    protected $maskingRules = [];
 
     /**
      * You can specify specific URL GET parameter keys to mask only them.

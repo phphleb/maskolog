@@ -15,7 +15,10 @@ final class StringMaskingProcessorTest extends TestCase
     use CreateLogRecordTrait;
     use MixedValuesProviderTrait;
 
-    private StringMaskingProcessor $processor;
+    /**
+     * @var StringMaskingProcessor
+     */
+    private $processor;
 
     protected function setUp(): void
     {
