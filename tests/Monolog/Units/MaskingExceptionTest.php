@@ -7,6 +7,7 @@ namespace MaskologLoggerTests\Monolog\Units;
 use Maskolog\Enums\PasswordMaskingStatus;
 use Maskolog\Exceptions\MaskedException;
 use Maskolog\Exceptions\MaskingExceptionInterface;
+use Maskolog\Internal\ExceptionManager;
 use Maskolog\Logger;
 use Maskolog\Processors\Masking\Context\PasswordMaskingProcessor;
 use Maskolog\Processors\Masking\Context\StringMaskingProcessor;
@@ -81,9 +82,10 @@ class MaskingExceptionTest extends TestCase
         $maskToken = (new StringMaskingProcessor())->addMask('secret');
         $expectedMessage = "Token output: {$maskToken}";
         $exception = (new MaskedException('Token output: {token}'))->setContext(['token' => 'secret']);
+        $logger = $logger->withMaskingProcessors([StringMaskingProcessor::class => 'token']);
+        $manager = new ExceptionManager($logger);
         try {
-            $logger->withMaskingProcessors([StringMaskingProcessor::class => 'token'])
-                ->throwMaskedException($exception);
+            $manager->throwMaskedException($exception);
         } catch (MaskingExceptionInterface $e){
             $message = $e->getMessage();
         }
