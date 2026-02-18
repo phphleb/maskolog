@@ -381,31 +381,6 @@ class Logger implements LoggerInterface
         return !is_null($this->loggerFactory->getExceptionHandler());
     }
 
-    /**
-     * Returns an exception object with masking processors from the logger added.
-     */
-    final public function createMaskedException(
-        MaskingExceptionInterface $e,
-    ): MaskingExceptionInterface
-    {
-        foreach(array_reverse($this->getMaskingProcessors()) as $processor) {
-            $e->pushMaskingProcessor($processor);
-        }
-        return $e->finalize($this->isEnableMasking);
-    }
-
-    /**
-     * Throws an exception using masking.
-     *
-     * @throws MaskingExceptionInterface
-     */
-    final public function throwMaskedException(
-        MaskingExceptionInterface $e,
-    ): void
-    {
-        throw $this->createMaskedException($e);
-    }
-
     final public function isEnableMasking(): bool
     {
         return $this->isEnableMasking;

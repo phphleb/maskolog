@@ -53,7 +53,7 @@ class ExampleManagedLoggerFactory extends AbstractManagedLoggerFactory
 
         $logger = (new Logger($this->channel))
             ->useMicrosecondTimestamps(true)
-            ->setTimezone(new DateTimeZone('Europe/Moscow'))
+            ->setTimezone(new DateTimeZone('UTC'))
             ->pushProcessor(static function ($record) {
                 return (new PsrLogMessageProcessor(removeUsedContextFields: true))($record);
             });

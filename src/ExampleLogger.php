@@ -19,9 +19,10 @@ class ExampleLogger extends Logger
     protected const CHANNEL_NAME = 'example';
 
     public function __construct(
-        string $maxLevel = LogLevel::ERROR,
-        string $stream = 'php://stdout',
-        bool|string $enableMasking = true,
+        ?AbstractManagedLoggerFactory $factory = null,
+        string                        $maxLevel = LogLevel::ERROR,
+        string                        $stream = 'php://stdout',
+        bool|string                   $enableMasking = true,
     )
     {
         // Passing an environment parameter to Symfony.
@@ -29,13 +30,16 @@ class ExampleLogger extends Logger
             $enableMasking = $enableMasking === 'prod';
         }
 
-        parent::__construct(new ExampleManagedLoggerFactory(
-            $maxLevel,
-            stream: $stream,
-            channel: self::CHANNEL_NAME,
-            filePrefix: self::CHANNEL_NAME,
-            maskingEnabled: $enableMasking,
-        ));
+        if (!$factory) {
+            $factory = new ExampleManagedLoggerFactory(
+                $maxLevel,
+                stream: $stream,
+                channel: self::CHANNEL_NAME,
+                filePrefix: self::CHANNEL_NAME,
+                maskingEnabled: $enableMasking,
+            );
+        }
+        parent::__construct($factory);
     }
 
     /**
