@@ -89,8 +89,9 @@ class ExampleManagedLoggerFactory extends AbstractManagedLoggerFactory
         $level = $this->getMaxLevel();
 
         $logger = (new Logger($this->channel))
+            // In some versions of Monolog, the microsecond setting may differ.
             ->useMicrosecondTimestamps(true)
-            ->setTimezone(new DateTimeZone('Europe/Moscow'))
+            ->setTimezone(new DateTimeZone('UTC'))
             ->pushProcessor(static function ($record) {
                 return (new PsrLogMessageProcessor(null, true))($record);
             });
