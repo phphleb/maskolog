@@ -19,11 +19,13 @@ class ExampleLogger extends Logger
     protected const CHANNEL_NAME = 'example';
 
     /**
+     * @param AbstractManagedLoggerFactory|null $factory
      * @param string $maxLevel
      * @param string $stream
      * @param bool|string $enableMasking
      */
     public function __construct(
+        ?AbstractManagedLoggerFactory $factory = null,
         string $maxLevel = LogLevel::ERROR,
         string $stream = 'php://stdout',
         $enableMasking = true
@@ -34,13 +36,17 @@ class ExampleLogger extends Logger
             $enableMasking = $enableMasking === 'prod';
         }
 
-        parent::__construct(new ExampleManagedLoggerFactory(
-            $maxLevel,
-            $stream,
-            self::CHANNEL_NAME,
-            self::CHANNEL_NAME,
-            $enableMasking,
-        ));
+        if (!$factory) {
+            $factory = new ExampleManagedLoggerFactory(
+                $maxLevel,
+                $stream,
+                self::CHANNEL_NAME,
+                self::CHANNEL_NAME,
+                $enableMasking,
+            );
+        }
+
+        parent::__construct($factory);
     }
 
     /**

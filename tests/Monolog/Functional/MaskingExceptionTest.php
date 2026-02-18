@@ -7,6 +7,7 @@ namespace MaskologLoggerTests\Monolog\Functional;
 use Maskolog\Enums\PasswordMaskingStatus;
 use Maskolog\Exceptions\MaskedException;
 use Maskolog\Exceptions\MaskingExceptionInterface;
+use Maskolog\Internal\ExceptionManager;
 use Maskolog\Logger;
 use Maskolog\Processors\Masking\Context\PasswordMaskingProcessor;
 use MaskologLoggerTests\Monolog\Functional\LoggerFactory\SimpleTestManagedLoggerFactory;
@@ -30,7 +31,8 @@ class MaskingExceptionTest extends TestCase
             ->pushMaskingProcessor(new PasswordMaskingProcessor(['password1']));
         $logger = $logger->withMaskingProcessor(new PasswordMaskingProcessor(['password2']));
         $resultMessage = "Test masked message {$placeholder}/{$placeholder}";
-        $resultException = $logger->createMaskedException($exception);
+        $manager = new ExceptionManager($logger);
+        $resultException = $manager->createMaskedException($exception);
         $this->assertEquals($resultMessage, $resultException->getMessage());
     }
 
@@ -44,8 +46,9 @@ class MaskingExceptionTest extends TestCase
             ->pushMaskingProcessor(new PasswordMaskingProcessor(['password1']));
         $logger = $logger->withMaskingProcessor(new PasswordMaskingProcessor(['password2']));
         $resultMessage = "Test masked message {$placeholder}/{$placeholder}";
+        $manager = new ExceptionManager($logger);
         try {
-            $logger->throwMaskedException($exception);
+            $manager->throwMaskedException($exception);
         } catch (MaskingExceptionInterface $e){
             $result = $e->getMessage();
         }
