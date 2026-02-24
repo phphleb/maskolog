@@ -710,6 +710,7 @@ class Logger implements LoggerInterface
         }
         if ($this->hasUnmaskingHandlers()) {
             $this->unmaskingLogger = clone $this->getLoggerInstance();
+            $this->unmaskingLogger->setHandlers([]);
             $this->loggerFactory->registerWeakReference($this->unmaskingLogger);
             foreach (array_reverse(array_filter($this->processors)) as $p) $this->unmaskingLogger->pushProcessor($p);
             foreach (array_reverse($this->getUnmaskingHandlers()) as $h) $this->unmaskingLogger->pushHandler($h);
