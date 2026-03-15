@@ -10,7 +10,7 @@
   <img src="https://github.com/phphleb/maskolog/blob/8a33a8e619574ce0b49383a691fb234fbdd5ed80/example.png" style="width: 600px" alt="maskolog" />
 </p>
 
-Supports PHP versions v7.4 - 8.0 and [v8.1+](https://github.com/phphleb/maskolog/tree/main)
+Supports PHP versions [v7.3](https://github.com/phphleb/maskolog/tree/0.x), v7.4 - 8.0 and [v8.1+](https://github.com/phphleb/maskolog/tree/main)
 
 _From the author:_
 
