@@ -22,6 +22,8 @@ class StringMaskingStatus {
 
     const REPLACEMENT = '*REDACTED*';
 
+    const REPLACEMENT_START_PART = '*REDACTED';
+
     /**
      * @param mixed $value
      */
@@ -51,5 +53,13 @@ class StringMaskingStatus {
             $str,
             Functions::getDebugType($value),
         );
+    }
+
+    /**
+     * Check if a string has already been masked before.
+     */
+    public static function checkIsMasked(string $value): bool
+    {
+        return strpos($value, self::REPLACEMENT_START_PART) !== false;
     }
 }
