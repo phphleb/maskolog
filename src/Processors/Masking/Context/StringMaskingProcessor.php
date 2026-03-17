@@ -28,7 +28,10 @@ class StringMaskingProcessor extends AbstractContextMaskingProcessor
         }
 
         if (!is_string($value)) {
-            return StringMaskingStatus::INVALID_TYPE->detailedFormat($value);
+            return $this->getDetailedFormat($value);
+        }
+        if ($this->checkIsMasked($value)) {
+            return $value;
         }
         $len = mb_strlen($value);
         $mark = StringMaskingStatus::REPLACEMENT->value;
@@ -40,5 +43,21 @@ class StringMaskingProcessor extends AbstractContextMaskingProcessor
         }
 
         return $mark;
+    }
+
+    /**
+     * Cast to template if type does not match.
+     */
+    protected function getDetailedFormat(#[\SensitiveParameter] mixed $value): string
+    {
+        return StringMaskingStatus::INVALID_TYPE->detailedFormat($value);
+    }
+
+    /**
+     * Check if a string has already been masked before.
+     */
+    protected static function checkIsMasked(#[\SensitiveParameter] string $value): bool
+    {
+        return StringMaskingStatus::checkIsMasked($value);
     }
 }

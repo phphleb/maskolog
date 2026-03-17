@@ -21,6 +21,8 @@ enum StringMaskingStatus: string
 
     case REPLACEMENT = '*REDACTED*';
 
+    case REPLACEMENT_START_PART = '*REDACTED';
+
     public function format(#[\SensitiveParameter] mixed $value): string
     {
         return sprintf(
@@ -45,5 +47,13 @@ enum StringMaskingStatus: string
             $this->value,
             get_debug_type($value),
         );
+    }
+
+    /**
+     * Check if a string has already been masked before.
+     */
+    public static function checkIsMasked(#[\SensitiveParameter] string $value): bool
+    {
+        return str_contains($value, self::REPLACEMENT_START_PART->value);
     }
 }
