@@ -54,6 +54,11 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
      */
     private function updateContext(array $context): array
     {
+        $optimized = $this->updateContextBySimpleGlobalCells($context);
+        if (!is_null($optimized)) {
+            return $optimized;
+        }
+
         if ($this->cells) {
             foreach ($this->cells as $key => $cell) {
                 if (is_int($key) && (is_string($cell) || is_int($cell))) {
@@ -80,19 +85,104 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
     }
 
     /**
-     * @param int|string $cell
+     * Applies a fast masking path for simple global keys.
+     *
+     * Works only for structures like:
+     * ['token', 'password', 100, ...]
+     *
+     * @param array<int|string, mixed> $context
+     * @return array<int|string, mixed>|null
+     */
+    private function updateContextBySimpleGlobalCells(array $context): ?array
+    {
+        if (!$this->cells) {
+            return null;
+        }
+        /**
+         * @var array<int, int|string> $simpleCells
+         */
+        $simpleCells = [];
+        foreach ($this->cells as $key => $cell) {
+            if (!is_int($key) || (!is_string($cell) && !is_int($cell))) {
+                return null;
+            }
+            $simpleCells[] = $cell;
+        }
+
+        /** @var array<int, int|string> $intLookup */
+        $intLookup = [];
+        /** @var array<string, string> $stringLookup */
+        $stringLookup = [];
+        foreach ($simpleCells as $cell) {
+            if (is_int($cell)) {
+                $intLookup[$cell] = $cell;
+                continue;
+            }
+            $stringLookup[mb_strtolower($cell)] = $cell;
+        }
+
+        return $this->maskValueBySimpleGlobalCells($context, $intLookup, $stringLookup);
+    }
+
+    /**
      * @param array<int|string, mixed> $array
+     * @param array<int, int|string> $intLookup
+     * @param array<string, string> $stringLookup
      * @return array<int|string, mixed>
      */
-    private function maskValueByKey($cell, array $array): array
+    private function maskValueBySimpleGlobalCells(
+        array $array,
+        array $intLookup,
+        array $stringLookup
+    ): array
     {
+        foreach ($array as $key => $value) {
+            $matchedCell = null;
+            if (is_int($key) && isset($intLookup[$key])) {
+                $matchedCell = $intLookup[$key];
+            }
+            if (is_string($key)) {
+                $matchedStringCell = $stringLookup[mb_strtolower($key)] ?? null;
+                if (!is_null($matchedStringCell)) {
+                    $matchedCell = $matchedStringCell;
+                }
+            }
+            if (!is_null($matchedCell)) {
+                $array[$key] = $this->prepareMask($matchedCell, $value);
+                continue;
+            }
+
+            if (is_array($value)) {
+                $array[$key] = $this->maskValueBySimpleGlobalCells($value, $intLookup, $stringLookup);
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * @param int|string $cell
+     * @param array<int|string, mixed> $array
+     * @param string|null $lowerCaseCell
+     * @param bool|null $isAscii
+     * @return array<int|string, mixed>
+     */
+    private function maskValueByKey($cell, array $array, ?string $lowerCaseCell = null, ?bool $isAscii = null): array
+    {
+        if (is_null($isAscii) && is_string($cell)) {
+            $isAscii = mb_check_encoding($cell, 'ASCII');
+            if (!$isAscii) {
+                $lowerCaseCell = mb_strtolower($cell);
+            }
+        }
+
         foreach ($array as $k => $v) {
-            if ($this->compareWithCriteria($k, $cell)) {
+            if ($this->compareWithCriteria($k, $cell, $lowerCaseCell, $isAscii)) {
                 $array[$k] = $this->prepareMask($cell, $v);
                 continue;
             }
             if (is_array($v)) {
-                $array[$k] = $this->maskValueByKey($cell, $v);
+                $array[$k] = $this->maskValueByKey($cell, $v, $lowerCaseCell, $isAscii);
             }
         }
 
@@ -209,16 +299,25 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
     }
 
     /**
-     * @param mixed $a
-     * @param mixed $b
+     * Returns the result of a case-insensitive comparison that can be overridden.
+     * Applies to global fields only.
+     *
+     * @param mixed $key - the key to be checked from the log context.
+     * @param mixed $ruleKey - the key to be checked from the given rule.
+     * @param string|null $loverCaseCell - the key being checked converted to lowercase.
+     * @param bool|null $isAscii - if the key being checked is a string in ASCII format.
      * @return bool
      */
-    protected function compareWithCriteria($a, $b): bool
+    protected function compareWithCriteria($key, $ruleKey, ?string $loverCaseCell, ?bool $isAscii): bool
     {
-        if (is_string($a) && is_string($b)) {
-           return mb_strtolower($a) === mb_strtolower($b);
+        if (is_string($key)) {
+            if ($isAscii) {
+                /** @var string $ruleKey */
+                return strcasecmp($key, $ruleKey) === 0;
+            }
+           return $loverCaseCell === mb_strtolower($key);
         }
-        return $a === $b;
+        return $key === $ruleKey;
     }
 
     /**
