@@ -54,6 +54,11 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
      */
     private function updateContext(array $context): array
     {
+        $optimized = $this->updateContextBySimpleGlobalCells($context);
+        if (!is_null($optimized)) {
+            return $optimized;
+        }
+
         if ($this->cells) {
             foreach ($this->cells as $key => $cell) {
                 if (is_int($key) && (is_string($cell) || is_int($cell))) {
@@ -77,6 +82,82 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
         }
 
         return $context;
+    }
+
+    /**
+     * Applies a fast masking path for simple global keys.
+     *
+     * Works only for structures like:
+     * ['token', 'password', 100, ...]
+     *
+     * @param array<int|string, mixed> $context
+     * @return array<int|string, mixed>|null
+     */
+    private function updateContextBySimpleGlobalCells(array $context): ?array
+    {
+        if (!$this->cells) {
+            return null;
+        }
+        /**
+         * @var array<int, int|string> $simpleCells
+         */
+        $simpleCells = [];
+        foreach ($this->cells as $key => $cell) {
+            if (!is_int($key) || (!is_string($cell) && !is_int($cell))) {
+                return null;
+            }
+            $simpleCells[] = $cell;
+        }
+
+        /** @var array<int, int|string> $intLookup */
+        $intLookup = [];
+        /** @var array<string, string> $stringLookup */
+        $stringLookup = [];
+        foreach ($simpleCells as $cell) {
+            if (is_int($cell)) {
+                $intLookup[$cell] = $cell;
+                continue;
+            }
+            $stringLookup[mb_strtolower($cell)] = $cell;
+        }
+
+        return $this->maskValueBySimpleGlobalCells($context, $intLookup, $stringLookup);
+    }
+
+    /**
+     * @param array<int|string, mixed> $array
+     * @param array<int, int|string> $intLookup
+     * @param array<string, string> $stringLookup
+     * @return array<int|string, mixed>
+     */
+    private function maskValueBySimpleGlobalCells(
+        array $array,
+        array $intLookup,
+        array $stringLookup
+    ): array
+    {
+        foreach ($array as $key => $value) {
+            $matchedCell = null;
+            if (is_int($key) && isset($intLookup[$key])) {
+                $matchedCell = $intLookup[$key];
+            }
+            if (is_string($key)) {
+                $matchedStringCell = $stringLookup[mb_strtolower($key)] ?? null;
+                if (!is_null($matchedStringCell)) {
+                    $matchedCell = $matchedStringCell;
+                }
+            }
+            if (!is_null($matchedCell)) {
+                $array[$key] = $this->prepareMask($matchedCell, $value);
+                continue;
+            }
+
+            if (is_array($value)) {
+                $array[$key] = $this->maskValueBySimpleGlobalCells($value, $intLookup, $stringLookup);
+            }
+        }
+
+        return $array;
     }
 
     /**
