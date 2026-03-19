@@ -82,17 +82,26 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
     /**
      * @param int|string $cell
      * @param array<int|string, mixed> $array
+     * @param string|null $lowerCaseCell
+     * @param bool|null $isAscii
      * @return array<int|string, mixed>
      */
-    private function maskValueByKey($cell, array $array): array
+    private function maskValueByKey($cell, array $array, ?string $lowerCaseCell = null, ?bool $isAscii = null): array
     {
+        if (is_null($isAscii) && is_string($cell)) {
+            $isAscii = mb_check_encoding($cell, 'ASCII');
+            if (!$isAscii) {
+                $lowerCaseCell = mb_strtolower($cell);
+            }
+        }
+
         foreach ($array as $k => $v) {
-            if ($this->compareWithCriteria($k, $cell)) {
+            if ($this->compareWithCriteria($k, $cell, $lowerCaseCell, $isAscii)) {
                 $array[$k] = $this->prepareMask($cell, $v);
                 continue;
             }
             if (is_array($v)) {
-                $array[$k] = $this->maskValueByKey($cell, $v);
+                $array[$k] = $this->maskValueByKey($cell, $v, $lowerCaseCell, $isAscii);
             }
         }
 
@@ -209,16 +218,25 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
     }
 
     /**
-     * @param mixed $a
-     * @param mixed $b
+     * Returns the result of a case-insensitive comparison that can be overridden.
+     * Applies to global fields only.
+     *
+     * @param mixed $key - the key to be checked from the log context.
+     * @param mixed $ruleKey - the key to be checked from the given rule.
+     * @param string|null $loverCaseCell - the key being checked converted to lowercase.
+     * @param bool|null $isAscii - if the key being checked is a string in ASCII format.
      * @return bool
      */
-    protected function compareWithCriteria($a, $b): bool
+    protected function compareWithCriteria($key, $ruleKey, ?string $loverCaseCell, ?bool $isAscii): bool
     {
-        if (is_string($a) && is_string($b)) {
-           return mb_strtolower($a) === mb_strtolower($b);
+        if (is_string($key)) {
+            if ($isAscii) {
+                /** @var string $ruleKey */
+                return strcasecmp($key, $ruleKey) === 0;
+            }
+           return $loverCaseCell === mb_strtolower($key);
         }
-        return $a === $b;
+        return $key === $ruleKey;
     }
 
     /**
