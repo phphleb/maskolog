@@ -142,6 +142,89 @@ class SpecificFieldMaskingTest extends TestCase
         $this->assertEquals($expected, (array)$log->context);
     }
 
+    /**
+     * @throws JsonException
+     */
+    public function testStringMaskingDuplicateProcessorMergeKeepsEmptyNestedRule(): void
+    {
+        $factory = new SimpleTestManagedLoggerFactory();
+        $logger = new Logger($factory);
+        $testHandler = new TestHandler();
+        $testHandler->setFormatter(new JsonFormatter(JsonFormatter::BATCH_MODE_JSON, true, false, true));
+        $logger = $logger->withHandler($testHandler);
+        $maskedToken = (new StringMaskingProcessor())->addMask('secret_token');
+
+        $logger
+            ->withMaskingProcessors([StringMaskingProcessor::class => ['test' => []]])
+            ->withMaskingProcessors([StringMaskingProcessor::class => ['test' => ['cell']]])
+            ->info('Nested merge', [
+                'test' => [
+                    'cell' => 'secret_token',
+                    'other' => 'secret_token',
+                ],
+            ]);
+
+        $result = $this->convertHandler($testHandler);
+        $this->assertCount(1, $result);
+        $log = current($result);
+        $this->assertEquals($maskedToken, $log->context->test->cell);
+        $this->assertEquals($maskedToken, $log->context->test->other);
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function testStringMaskingMergeTopLevelEmptyThenFieldList(): void
+    {
+        $factory = new SimpleTestManagedLoggerFactory();
+        $logger = new Logger($factory);
+        $testHandler = new TestHandler();
+        $testHandler->setFormatter(new JsonFormatter(JsonFormatter::BATCH_MODE_JSON, true, false, true));
+        $logger = $logger->withHandler($testHandler);
+        $maskedToken = (new StringMaskingProcessor())->addMask('secret_token');
+
+        $logger
+            ->withMaskingProcessors([StringMaskingProcessor::class => []])
+            ->withMaskingProcessors([StringMaskingProcessor::class => ['test']])
+            ->info('Top-level merge', [
+                'test' => 'secret_token',
+                'other' => 'secret_token',
+            ]);
+
+        $result = $this->convertHandler($testHandler);
+        $this->assertCount(1, $result);
+        $log = current($result);
+        $this->assertEquals($maskedToken, $log->context->test);
+        $this->assertEquals('secret_token', $log->context->other);
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function testStringMaskingMergeFieldListThenTopLevelEmpty(): void
+    {
+        $factory = new SimpleTestManagedLoggerFactory();
+        $logger = new Logger($factory);
+        $testHandler = new TestHandler();
+        $testHandler->setFormatter(new JsonFormatter(JsonFormatter::BATCH_MODE_JSON, true, false, true));
+        $logger = $logger->withHandler($testHandler);
+        $maskedToken = (new StringMaskingProcessor())->addMask('secret_token');
+
+        $logger
+            ->withMaskingProcessors([StringMaskingProcessor::class => ['test']])
+            ->withMaskingProcessors([StringMaskingProcessor::class => []])
+            ->info('Top-level merge', [
+                'test' => 'secret_token',
+                'other' => 'secret_token',
+            ]);
+
+        $result = $this->convertHandler($testHandler);
+        $this->assertCount(1, $result);
+        $log = current($result);
+        $this->assertEquals($maskedToken, $log->context->test);
+        $this->assertEquals('secret_token', $log->context->other);
+    }
+
     public function testMaskingHandlesNonStandardCharacters(): void
     {
         $factory = new SimpleTestManagedLoggerFactory();
