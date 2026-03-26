@@ -120,7 +120,9 @@ class ProcessorManager
                      * @var array<int|string, array<int|string, mixed>> $originParams
                      * @var array<int|string, mixed> $params
                      */
-                    $maskingProcessors[$k] = [$key => self::format(array_merge_recursive($originParams, $params))];
+                    $merged = array_merge_recursive($originParams, $params);
+                    $merged = self::applyEmptyNestedArrayWins($merged, $originParams, $params);
+                    $maskingProcessors[$k] = [$key => self::format($merged)];
                     /** @var array<int, MaskingProcessorInterface|array<int, mixed>|callable> */
 
                     return $maskingProcessors;
@@ -128,6 +130,49 @@ class ProcessorManager
             }
         }
         return [];
+    }
+
+    /**
+     * If the same key exists in both parameter sets and both values are arrays, an empty array
+     * means «mask all nested values under this key» and must not be narrowed by array_merge_recursive.
+     *
+     * @param array<int|string, mixed> $merged
+     * @param array<int|string, mixed> $origin
+     * @param array<int|string, mixed> $new
+     * @return array<int|string, mixed>
+     */
+    private static function applyEmptyNestedArrayWins(
+        #[\SensitiveParameter] array $merged,
+        #[\SensitiveParameter] array $origin,
+        #[\SensitiveParameter] array $new
+    ): array
+    {
+        foreach ($origin as $key => $originValue) {
+            if (!array_key_exists($key, $new)) {
+                continue;
+            }
+
+            $newValue = $new[$key];
+
+            if (!is_array($originValue) || !is_array($newValue)) {
+                continue;
+            }
+
+            if (count($originValue) === 0 || count($newValue) === 0) {
+                $merged[$key] = [];
+                continue;
+            }
+
+            if (isset($merged[$key]) && is_array($merged[$key])) {
+                $merged[$key] = self::applyEmptyNestedArrayWins(
+                    $merged[$key],
+                    $originValue,
+                    $newValue
+                );
+            }
+        }
+
+        return $merged;
     }
 
     /**

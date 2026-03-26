@@ -144,4 +144,52 @@ class ProcessorManagerTest extends TestCase
 
         self::assertSame($result, $combine);
     }
+
+    /**
+     * An empty nested array under a key means «mask all descendants»; merging with a narrower rule
+     * must not replace it with a list of sub-keys.
+     */
+    public function testRemoveDuplicatesStringMaskingEmptyNestedKeyMeansAllSubkeysWinsOverNarrowerRule(): void
+    {
+        $class = StringMaskingProcessor::class;
+        $expected = [[$class => ['test' => []]]];
+
+        $result = ProcessorManager::removeDuplicates(
+            [[$class => ['test' => []]]],
+            $class,
+            ['test' => ['cell']]
+        );
+        self::assertSame($expected, $result);
+
+        $result = ProcessorManager::removeDuplicates(
+            [[$class => ['test' => ['cell']]]],
+            $class,
+            ['test' => []]
+        );
+        self::assertSame($expected, $result);
+    }
+
+    /**
+     * Top-level [] has no keys, so applyEmptyNestedArrayWins does not run; merge behaves like
+     * array_merge_recursive only — result is the narrow field list in both orders.
+     */
+    public function testRemoveDuplicatesStringMaskingTopLevelEmptyMergeWithFieldListSameInBothOrders(): void
+    {
+        $class = StringMaskingProcessor::class;
+        $expected = [[$class => ['test']]];
+
+        $result = ProcessorManager::removeDuplicates(
+            [[$class => []]],
+            $class,
+            ['test']
+        );
+        self::assertSame($expected, $result);
+
+        $result = ProcessorManager::removeDuplicates(
+            [[$class => ['test']]],
+            $class,
+            []
+        );
+        self::assertSame($expected, $result);
+    }
 }
