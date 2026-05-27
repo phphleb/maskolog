@@ -29,19 +29,9 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
     protected $except = [];
 
     /**
-     * @var array<int, true>
+     * @var list<array{key: int|string, loverCaseCell: ?string, isAscii: ?bool}>|null
      */
-    private $exceptIntLookup = [];
-
-    /**
-     * @var array<string, true>
-     */
-    private $exceptStringLookup = [];
-
-    /**
-     * @var array<int|string, bool>
-     */
-    private $exceptKeyMatchCache = [];
+    private $exceptRules = null;
 
     /** @var int|string|null  */
     private $currentCell = null;
@@ -220,11 +210,10 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
      */
     private function maskValueByKey($cell, array $array, ?string $lowerCaseCell = null, ?bool $isAscii = null): array
     {
-        if (is_null($isAscii) && is_string($cell)) {
-            $isAscii = mb_check_encoding($cell, 'ASCII');
-            if (!$isAscii) {
-                $lowerCaseCell = mb_strtolower($cell);
-            }
+        if (is_null($isAscii)) {
+            $normalized = $this->normalizeRuleKey($cell);
+            $lowerCaseCell = $normalized['loverCaseCell'];
+            $isAscii = $normalized['isAscii'];
         }
 
         foreach ($array as $k => $v) {
@@ -395,48 +384,57 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
      * @param mixed $key
      * @return bool
      */
-    protected function isExceptKey($key): bool
+    private function isExceptKey($key): bool
     {
-        if (!is_int($key) && !is_string($key)) {
+        if ((!is_int($key) && !is_string($key)) || !$this->except) {
             return false;
         }
-        if (!$this->except) {
-            return false;
-        }
-        if (array_key_exists($key, $this->exceptKeyMatchCache)) {
-            return $this->exceptKeyMatchCache[$key];
-        }
-
-        if (is_int($key) && isset($this->exceptIntLookup[$key])) {
-            return $this->exceptKeyMatchCache[$key] = true;
-        }
-        if (is_string($key) && isset($this->exceptStringLookup[mb_strtolower($key)])) {
-            return $this->exceptKeyMatchCache[$key] = true;
+        foreach ($this->getExceptRules() as $rule) {
+            if ($this->compareWithCriteria($key, $rule['key'], $rule['loverCaseCell'], $rule['isAscii'])) {
+                return true;
+            }
         }
 
-        $matched = false;
+        return false;
+    }
+
+    /**
+     * @return list<array{key: int|string, loverCaseCell: ?string, isAscii: ?bool}>
+     */
+    private function getExceptRules(): array
+    {
+        if ($this->exceptRules !== null) {
+            return $this->exceptRules;
+        }
+        $rules = [];
         foreach ($this->except as $exceptKey) {
-            if (is_int($exceptKey)) {
-                if (!isset($this->exceptIntLookup[$exceptKey])) {
-                    $this->exceptIntLookup[$exceptKey] = true;
-                }
-                if (is_int($key) && $key === $exceptKey) {
-                    $matched = true;
-                }
-                continue;
-            }
-            if (is_string($exceptKey)) {
-                $lowerExcept = mb_strtolower($exceptKey);
-                if (!isset($this->exceptStringLookup[$lowerExcept])) {
-                    $this->exceptStringLookup[$lowerExcept] = true;
-                }
-                if (is_string($key) && mb_strtolower($key) === $lowerExcept) {
-                    $matched = true;
-                }
-            }
+            $normalized = $this->normalizeRuleKey($exceptKey);
+            $rules[] = [
+                'key' => $exceptKey,
+                'loverCaseCell' => $normalized['loverCaseCell'],
+                'isAscii' => $normalized['isAscii'],
+            ];
         }
+        $this->exceptRules = $rules;
 
-        return $this->exceptKeyMatchCache[$key] = $matched;
+        return $this->exceptRules;
+    }
+
+    /**
+     * @param int|string $ruleKey
+     * @return array{loverCaseCell: ?string, isAscii: ?bool}
+     */
+    private function normalizeRuleKey($ruleKey): array
+    {
+        if (!is_string($ruleKey)) {
+            return ['loverCaseCell' => null, 'isAscii' => null];
+        }
+        $isAscii = mb_check_encoding($ruleKey, 'ASCII');
+
+        return [
+            'loverCaseCell' => $isAscii ? null : mb_strtolower($ruleKey),
+            'isAscii' => $isAscii,
+        ];
     }
 
     /**
