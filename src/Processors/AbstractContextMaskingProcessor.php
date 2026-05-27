@@ -23,14 +23,65 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
      */
     protected $cells = [];
 
+    /**
+     * @var array<int|string, int|string>
+     */
+    protected $except = [];
+
+    /**
+     * @var array<int, true>
+     */
+    private $exceptIntLookup = [];
+
+    /**
+     * @var array<string, true>
+     */
+    private $exceptStringLookup = [];
+
+    /**
+     * @var array<int|string, bool>
+     */
+    private $exceptKeyMatchCache = [];
+
     /** @var int|string|null  */
     private $currentCell = null;
 
     /**
+     * Accepts a list of context fields to mask or a definition with an except list.
+     *
+     * When the except format is used, index `0` contains the regular cells rules
+     * and the `except` key lists field names that must be left unmasked.
+     * An empty array at index `0` means mask all context values except those listed
+     * under `except`.
+     *
+     * ```php
+     * new StringMaskingProcessor(['password', 'token']);
+     *
+     * new StringMaskingProcessor([
+     *     ['level' => []],
+     *     'except' => ['public_token'],
+     * ]);
+     * ```
+     *
      * @param array<int|string, int|string|array<int|string, mixed>> $cells
      */
     public function __construct(array $cells = [])
     {
+        if ($this->isCellsExceptDefinition($cells)) {
+            /**
+             * @var array<int|string, int|string|array<int|string, mixed>> $cellsList
+             */
+            $cellsList = $cells[0];
+            /**
+             * @var array<int|string, int|string> $exceptList
+             */
+            $exceptList = $cells['except'];
+            $this->cells = $cellsList;
+            $this->except = $exceptList;
+
+            return;
+        }
+
         $this->cells = $cells;
     }
 
@@ -269,6 +320,9 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
     private function maskAllValues(array $array): array
     {
         foreach ($array as $key => $value) {
+            if ($this->isExceptKey($key)) {
+                continue;
+            }
             if (is_array($value)) {
                 $array[$key] = $this->maskAllValues($value);
             } else {
@@ -321,12 +375,81 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
     }
 
     /**
+     * Checks whether the array is a cells definition with an except list.
+     *
+     * @param array<int|string, mixed> $cells
+     * @return bool
+     */
+    private function isCellsExceptDefinition(array $cells): bool
+    {
+        return count($cells) === 2
+            && array_key_exists(0, $cells)
+            && array_key_exists('except', $cells)
+            && is_array($cells[0])
+            && is_array($cells['except']);
+    }
+
+    /**
+     * Checks whether the key is listed in the except set.
+     *
+     * @param mixed $key
+     * @return bool
+     */
+    protected function isExceptKey($key): bool
+    {
+        if (!is_int($key) && !is_string($key)) {
+            return false;
+        }
+        if (!$this->except) {
+            return false;
+        }
+        if (array_key_exists($key, $this->exceptKeyMatchCache)) {
+            return $this->exceptKeyMatchCache[$key];
+        }
+
+        if (is_int($key) && isset($this->exceptIntLookup[$key])) {
+            return $this->exceptKeyMatchCache[$key] = true;
+        }
+        if (is_string($key) && isset($this->exceptStringLookup[mb_strtolower($key)])) {
+            return $this->exceptKeyMatchCache[$key] = true;
+        }
+
+        $matched = false;
+        foreach ($this->except as $exceptKey) {
+            if (is_int($exceptKey)) {
+                if (!isset($this->exceptIntLookup[$exceptKey])) {
+                    $this->exceptIntLookup[$exceptKey] = true;
+                }
+                if (is_int($key) && $key === $exceptKey) {
+                    $matched = true;
+                }
+                continue;
+            }
+            if (is_string($exceptKey)) {
+                $lowerExcept = mb_strtolower($exceptKey);
+                if (!isset($this->exceptStringLookup[$lowerExcept])) {
+                    $this->exceptStringLookup[$lowerExcept] = true;
+                }
+                if (is_string($key) && mb_strtolower($key) === $lowerExcept) {
+                    $matched = true;
+                }
+            }
+        }
+
+        return $this->exceptKeyMatchCache[$key] = $matched;
+    }
+
+    /**
      * @param int|string $cell
      * @param mixed $value
      * @return mixed
      */
-    private function prepareMask($cell, $value)
+    protected function prepareMask($cell, $value)
     {
+        if ($this->isExceptKey($cell)) {
+            return $value;
+        }
+
         $this->currentCell = $cell;
 
         return $this->addMask($value);

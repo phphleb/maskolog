@@ -30,6 +30,15 @@ class StructuredMaskingProcessor extends AbstractContextMaskingProcessor
             return ReplaceMaskingStatus::REPLACEMENT;
         }
 
-        return array_map([$this, 'addMask'], $value);
+        $result = [];
+        foreach ($value as $key => $item) {
+            if ($this->isExceptKey($key)) {
+                $result[$key] = $item;
+                continue;
+            }
+            $result[$key] = $this->addMask($item);
+        }
+
+        return $result;
     }
 }

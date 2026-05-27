@@ -113,6 +113,65 @@ class SpecificFieldMaskingTest extends TestCase
     /**
      * @throws JsonException
      */
+    public function testMaskAllWithExceptScalarField(): void
+    {
+        $factory = new SimpleTestManagedLoggerFactory();
+        $logger = new Logger($factory);
+        $testHandler = new TestHandler();
+        $testHandler->setFormatter(new JsonFormatter(JsonFormatter::BATCH_MODE_JSON, true, false, true));
+        $logger = $logger->withHandler($testHandler);
+        $maskedToken = (new StringMaskingProcessor())->addMask('secret_token');
+
+        $logger->withMaskingProcessors(
+            [StringMaskingProcessor::class => [['all' => []], 'except' => ['public_token']]]
+        )->info('List of tokens', [
+            'all' => [
+                'secret_token' => 'secret_token',
+                'public_token' => 'visible',
+            ],
+        ]);
+
+        $result = $this->convertHandler($testHandler);
+        $this->assertCount(1, $result);
+        $log = current($result);
+
+        $this->assertEquals($maskedToken, $log->context->all->secret_token);
+        $this->assertEquals('visible', $log->context->all->public_token);
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function testMaskAllWithExceptArrayField(): void
+    {
+        $factory = new SimpleTestManagedLoggerFactory();
+        $logger = new Logger($factory);
+        $testHandler = new TestHandler();
+        $testHandler->setFormatter(new JsonFormatter(JsonFormatter::BATCH_MODE_JSON, true, false, true));
+        $logger = $logger->withHandler($testHandler);
+        $maskedToken = (new StringMaskingProcessor())->addMask('secret_token');
+
+        $logger->withMaskingProcessors(
+            [StringMaskingProcessor::class => [0 => [], 'except' => ['level']]]
+        )->info('List of tokens', [
+            'secret_token' => 'secret_token',
+            'level' => ['secret_token', 'secret_token'],
+        ]);
+
+        $expected = [
+            'secret_token' => $maskedToken,
+            'level' => ['secret_token', 'secret_token'],
+        ];
+
+        $result = $this->convertHandler($testHandler);
+        $this->assertCount(1, $result);
+        $log = current($result);
+        $this->assertEquals($expected, (array)$log->context);
+    }
+
+    /**
+     * @throws JsonException
+     */
     public function testSpecificAllFieldMasking(): void
     {
         $factory = new SimpleTestManagedLoggerFactory();
