@@ -22,10 +22,44 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
     private null|int|string $currentCell = null;
 
     /**
+     * @var list<array{key: int|string, loverCaseCell: ?string, isAscii: ?bool}>|null
+     */
+    private ?array $exceptRules = null;
+
+    /**
+     * @var array<int|string, int|string>|null
+     */
+    private ?array $except = null;
+
+    /**
+     * Accepts a list of context fields to mask or a definition with an except list.
+     *
+     * When the except format is used, index `0` contains the regular cells rules
+     * and the `except` key lists field names that must be left unmasked.
+     * An empty array at index `0` means mask all context values except those listed
+     * under `except`.
+     *
+     * ```php
+     * new StringMaskingProcessor(['password', 'token']);
+     *
+     * new StringMaskingProcessor([
+     *     ['level' => []],
+     *     'except' => ['public_token'],
+     * ]);
+     * ```
+     *
      * @param array<int|string, int|string|array<int|string, mixed>> $cells
      */
     public function __construct(protected array $cells = [])
     {
+        if ($this->isCellsExceptDefinition($cells)) {
+            /** @var array<int|string, int|string|array<int|string, mixed>> $cellsList */
+            $cellsList = $cells[0];
+            /** @var array<int|string, int|string> $exceptList */
+            $exceptList = $cells['except'];
+            $this->except = $exceptList;
+            $this->cells = $cellsList;
+        }
     }
 
     /**
@@ -158,11 +192,10 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
      */
     private function maskValueByKey(int|string $cell, #[\SensitiveParameter] array $array, ?string $lowerCaseCell = null, ?bool $isAscii = null): array
     {
-        if (is_null($isAscii) && is_string($cell)) {
-            $isAscii = mb_check_encoding($cell, 'ASCII');
-            if (!$isAscii) {
-                $lowerCaseCell = mb_strtolower($cell);
-            }
+        if (is_null($isAscii)) {
+            $normalized = $this->normalizeRuleKey($cell);
+            $lowerCaseCell = $normalized['loverCaseCell'];
+            $isAscii = $normalized['isAscii'];
         }
 
         foreach ($array as $k => $v) {
@@ -257,6 +290,9 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
     private function maskAllValues(#[\SensitiveParameter] array $array): array
     {
         foreach ($array as $key => $value) {
+            if ($this->isExceptKey($key)) {
+                continue;
+            }
             if (is_array($value)) {
                 $array[$key] = $this->maskAllValues($value);
             } else {
@@ -303,8 +339,84 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
         return $key === $ruleKey;
     }
 
-    private function prepareMask(int|string $cell, #[\SensitiveParameter] mixed $value): mixed
+    /**
+     * Checks whether the array is a cells definition with an except list.
+     *
+     * @param array<int|string, mixed> $cells
+     */
+    private function isCellsExceptDefinition(array $cells): bool
     {
+        return count($cells) === 2
+            && array_key_exists(0, $cells)
+            && array_key_exists('except', $cells)
+            && is_array($cells[0])
+            && is_array($cells['except']);
+    }
+
+    /**
+     * Checks whether the key is listed in the except set.
+     */
+    private function isExceptKey(int|string $key): bool
+    {
+        if ($this->except === null) {
+            return false;
+        }
+        foreach ($this->getExceptRules() as $rule) {
+            if ($this->compareWithCriteria($key, $rule['key'], $rule['loverCaseCell'], $rule['isAscii'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return list<array{key: int|string, loverCaseCell: ?string, isAscii: ?bool}>
+     */
+    private function getExceptRules(): array
+    {
+        if ($this->exceptRules !== null) {
+            return $this->exceptRules;
+        }
+        if ($this->except === null) {
+            return [];
+        }
+        $rules = [];
+        foreach ($this->except as $exceptKey) {
+            $normalized = $this->normalizeRuleKey($exceptKey);
+            $rules[] = [
+                'key' => $exceptKey,
+                'loverCaseCell' => $normalized['loverCaseCell'],
+                'isAscii' => $normalized['isAscii'],
+            ];
+        }
+        $this->exceptRules = $rules;
+
+        return $this->exceptRules;
+    }
+
+    /**
+     * @return array{loverCaseCell: ?string, isAscii: ?bool}
+     */
+    private function normalizeRuleKey(int|string $ruleKey): array
+    {
+        if (!is_string($ruleKey)) {
+            return ['loverCaseCell' => null, 'isAscii' => null];
+        }
+        $isAscii = mb_check_encoding($ruleKey, 'ASCII');
+
+        return [
+            'loverCaseCell' => $isAscii ? null : mb_strtolower($ruleKey),
+            'isAscii' => $isAscii,
+        ];
+    }
+
+    protected function prepareMask(int|string $cell, #[\SensitiveParameter] mixed $value): mixed
+    {
+        if ($this->isExceptKey($cell)) {
+            return $value;
+        }
+
         $this->currentCell = $cell;
 
         return $this->addMask($value);

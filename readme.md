@@ -119,6 +119,26 @@ If you need to target a field at the top level, wrap it in array brackets — `[
 To mask all nested values under a given key, provide an empty array for that key — `['list' => []]`.
 You can also use numeric target keys (for example, `['list' => [0]]`), although this is not recommended.
 
+### Excluding Fields from Masking
+
+When a masking rule covers an entire nested structure or the whole context, you can still leave specific fields visible by adding an `except` list. Pass the regular `cells` rules at index `0` and field names to skip under the `except` key:
+
+```php
+$logger->withMaskingProcessors(
+    [StringMaskingProcessor::class => [
+        ['tokens' => []],
+        'except' => ['public_token'],
+    ]]
+)->info('List of tokens', [
+    'tokens' => [
+        'secret_token' => 'secret_token',  // masked
+        'public_token' => 'visible',       // left as-is
+    ],
+]);
+```
+
+Field names in `except` are matched case-insensitively at each nesting level where the rule applies.
+
 ### Masking for Objects in the Context
 
 By default, the logger converts objects to arrays, so an object will be masked like a regular associative array of data.

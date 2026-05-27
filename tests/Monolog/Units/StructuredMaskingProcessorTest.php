@@ -124,6 +124,40 @@ final class StructuredMaskingProcessorTest extends TestCase
         );
     }
 
+    public function testExceptPreservesNestedFieldUnderMaskAllRule(): void
+    {
+        $processor = new StructuredMaskingProcessor([
+            ['all'],
+            'except' => ['public_token'],
+        ]);
+        $record = $this->createLogRecord([
+            'context' => [
+                'all' => [
+                    'secret_token' => 'secret',
+                    'public_token' => [
+                        'nested' => 'visible',
+                        'leaf' => 'also visible',
+                    ],
+                ],
+            ],
+        ]);
+
+        $result = $processor($record);
+
+        $this->assertSame(
+            [
+                'all' => [
+                    'secret_token' => $this->replacement,
+                    'public_token' => [
+                        'nested' => 'visible',
+                        'leaf' => 'also visible',
+                    ],
+                ],
+            ],
+            $result->context
+        );
+    }
+
     public function testMaskingProcessorCollapsesStructuredValue(): void
     {
         $flatProcessor = new MaskingProcessor(['data']);
