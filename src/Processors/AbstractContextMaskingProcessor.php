@@ -24,9 +24,9 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
     protected $cells = [];
 
     /**
-     * @var array<int|string, int|string>
+     * @var array<int|string, int|string>|null
      */
-    protected $except = [];
+    private $except = null;
 
     /**
      * @var list<array{key: int|string, loverCaseCell: ?string, isAscii: ?bool}>|null
@@ -386,7 +386,7 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
      */
     private function isExceptKey($key): bool
     {
-        if ((!is_int($key) && !is_string($key)) || !$this->except) {
+        if ((!is_int($key) && !is_string($key)) || $this->except === null) {
             return false;
         }
         foreach ($this->getExceptRules() as $rule) {
@@ -405,6 +405,9 @@ abstract class AbstractContextMaskingProcessor implements MaskingProcessorInterf
     {
         if ($this->exceptRules !== null) {
             return $this->exceptRules;
+        }
+        if ($this->except === null) {
+            return [];
         }
         $rules = [];
         foreach ($this->except as $exceptKey) {
