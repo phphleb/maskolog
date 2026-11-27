@@ -21,7 +21,7 @@ class TestPsr7Request implements RequestInterface
 
     public function __construct(
         string $method = 'GET',
-        UriInterface|string $uri = null,
+        UriInterface|string|null $uri = null,
         array $headers = [],
         StreamInterface|string|null $body = null,
         string $protocolVersion = '1.1'

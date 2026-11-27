@@ -15,7 +15,7 @@ final class UrlMaskingProcessorTest extends TestCase
     /**
      * @dataProvider urlProvider
      */
-    public function testAddMask(string $originalUrl, string $expectedUrl, array $maskingRules = null): void
+    public function testAddMask(string $originalUrl, string $expectedUrl, ?array $maskingRules = null): void
     {
         $processor = new UrlMaskingProcessor(['url']);
         if ($maskingRules !== null) {
